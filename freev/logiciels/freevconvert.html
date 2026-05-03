@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freev Convert Pro | Convertisseur Ultime</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#0f172a',
+                            primary: '#0ea5e9',
+                            secondary: '#a855f7',
+                            accent: '#22d3ee',
+                            pink: '#ec4899',
+                        }
+                    },
+                    animation: {
+                        'pulse-glow': 'pulse-glow 3s infinite',
+                    },
+                    keyframes: {
+                        'pulse-glow': {
+                            '0%, 100%': { boxShadow: '0 0 20px #ec4899' },
+                            '50%': { boxShadow: '0 0 40px #a855f7' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base Styles */
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #ec4899, #a855f7); border-radius: 5px; }
+
+        .glass {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, #ec4899, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.5;
+        }
+
+        /* Inputs */
+        .input-dark {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s;
+        }
+        .input-dark:focus {
+            outline: none;
+            border-color: #ec4899;
+            box-shadow: 0 0 15px rgba(236, 72, 153, 0.2);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #ec4899;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #334155;
+            border-radius: 2px;
+        }
+
+        /* Animations */
+        .tab-content { display: none; animation: fadeIn 0.4s ease-out; }
+        .tab-content.active { display: block; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .nav-btn { position: relative; overflow: hidden; }
+        .nav-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #ec4899;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        .nav-btn.active::after { transform: scaleX(1); }
+        .nav-btn.active i { color: #ec4899; }
+        .nav-btn.active { color: white; background: rgba(255,255,255,0.05); }
+
+        /* Swap Button Animation */
+        .swap-btn:hover i {
+            transform: rotate(180deg);
+        }
+        .swap-btn i {
+            transition: transform 0.4s ease;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+
+    <!-- Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Header -->
+    <header class="fixed w-full z-50 glass">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-cube text-2xl text-brand-pink animate-pulse"></i>
+                <a href="../../reste%20github/freevindex.html" class="text-2xl font-heading font-bold tracking-wider">FREEV<span class="text-brand-pink">.</span> <span class="text-sm font-light text-gray-400">Convert Pro</span></a>
+            </div>
+            <nav class="hidden md:flex gap-6 font-medium text-sm">
+                <a href="../../reste%20github/freevindex.html" class="hover:text-brand-pink transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> Retour
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center pt-28 pb-12 px-4">
+        <div class="container mx-auto max-w-4xl">
+            
+            <!-- Title Section -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center gap-2 mb-3 px-4 py-1 rounded-full border border-brand-pink/30 bg-brand-pink/10 text-brand-pink text-xs font-bold tracking-widest uppercase">
+                    <i class="fa-solid fa-bolt"></i> Version Offline 2.0
+                </div>
+                <h1 class="text-4xl md:text-5xl font-heading font-extrabold mb-4">
+                    Convertisseur <span class="text-gradient">Pro</span>
+                </h1>
+                <p class="text-gray-400 max-w-lg mx-auto">La boîte à outils tout-en-un. Convertissez devises, unités et fichiers médias localement et instantanément.</p>
+            </div>
+
+            <!-- App Interface -->
+            <div class="glass-card rounded-3xl overflow-hidden shadow-2xl shadow-brand-pink/10 border border-brand-pink/20">
+                
+                <!-- Navigation Tabs -->
+                <div class="grid grid-cols-3 border-b border-white/10 bg-black/20">
+                    <button onclick="switchTab('currency')" id="btn-currency" class="nav-btn active py-5 font-heading font-bold text-sm md:text-lg text-gray-400 hover:text-white transition-all flex flex-col md:flex-row items-center justify-center gap-2">
+                        <i class="fa-solid fa-coins mb-1 md:mb-0"></i> Devises
+                    </button>
+                    <button onclick="switchTab('units')" id="btn-units" class="nav-btn py-5 font-heading font-bold text-sm md:text-lg text-gray-400 hover:text-white transition-all flex flex-col md:flex-row items-center justify-center gap-2">
+                        <i class="fa-solid fa-ruler-combined mb-1 md:mb-0"></i> Unités
+                    </button>
+                    <button onclick="switchTab('files')" id="btn-files" class="nav-btn py-5 font-heading font-bold text-sm md:text-lg text-gray-400 hover:text-white transition-all flex flex-col md:flex-row items-center justify-center gap-2">
+                        <i class="fa-solid fa-image mb-1 md:mb-0"></i> Images
+                    </button>
+                </div>
+
+                <div class="p-6 md:p-10 min-h-[450px]">
+
+                    <!-- 1. CURRENCY CONVERTER -->
+                    <div id="tab-currency" class="tab-content active">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold"><i class="fa-solid fa-money-bill-wave mr-2 text-brand-pink"></i>Change</h3>
+                            <span class="text-xs text-gray-500 bg-black/30 px-2 py-1 rounded border border-white/5">Taux indicatifs hors-ligne</span>
+                        </div>
+
+                        <div class="flex flex-col md:flex-row gap-4 items-center justify-center mb-8 relative">
+                            <!-- Left -->
+                            <div class="w-full md:w-5/12">
+                                <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wide">Montant & Devise</label>
+                                <div class="flex gap-2">
+                                    <input type="number" id="curr-amount" value="1" oninput="convertCurrency()" class="input-dark w-1/3 px-3 py-3 rounded-xl text-lg font-bold text-center">
+                                    <select id="curr-from" onchange="convertCurrency()" class="input-dark w-2/3 px-3 py-3 rounded-xl appearance-none cursor-pointer font-bold">
+                                        <option value="EUR">🇪🇺 EUR</option>
+                                        <option value="USD">🇺🇸 USD</option>
+                                        <option value="GBP">🇬🇧 GBP</option>
+                                        <option value="JPY">🇯🇵 JPY</option>
+                                        <option value="CAD">🇨🇦 CAD</option>
+                                        <option value="CHF">🇨🇭 CHF</option>
+                                        <option value="AUD">🇦🇺 AUD</option>
+                                        <option value="CNY">🇨🇳 CNY</option>
+                                        <option value="BTC">₿ BTC</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Swap Button -->
+                            <div class="mt-6 md:mt-0 z-10">
+                                <button onclick="swapCurrency()" class="swap-btn w-10 h-10 rounded-full bg-brand-pink text-white shadow-lg shadow-brand-pink/30 flex items-center justify-center hover:scale-110 active:scale-95 transition-all">
+                                    <i class="fa-solid fa-right-left"></i>
+                                </button>
+                            </div>
+
+                            <!-- Right -->
+                            <div class="w-full md:w-5/12">
+                                <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wide">Vers</label>
+                                <select id="curr-to" onchange="convertCurrency()" class="input-dark w-full px-4 py-3 rounded-xl appearance-none cursor-pointer font-bold">
+                                    <option value="USD">🇺🇸 USD - Dollar US</option>
+                                    <option value="EUR">🇪🇺 EUR - Euro</option>
+                                    <option value="GBP">🇬🇧 GBP - Livre Sterling</option>
+                                    <option value="JPY">🇯🇵 JPY - Yen Japonais</option>
+                                    <option value="CAD">🇨🇦 CAD - Dollar Canadien</option>
+                                    <option value="CHF">🇨🇭 CHF - Franc Suisse</option>
+                                    <option value="AUD">🇦🇺 AUD - Dollar Australien</option>
+                                    <option value="CNY">🇨🇳 CNY - Yuan Chinois</option>
+                                    <option value="BTC">₿ BTC - Bitcoin</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Result Box -->
+                        <div class="bg-gradient-to-br from-white/5 to-white/0 rounded-2xl p-8 text-center border border-white/10 relative group">
+                            <span class="text-gray-400 text-sm uppercase tracking-widest mb-2 block">Résultat Estimé</span>
+                            <div class="flex items-center justify-center gap-3">
+                                <div id="curr-result" class="text-4xl md:text-6xl font-heading font-extrabold text-white tracking-tight">
+                                    1.09
+                                </div>
+                                <span id="curr-result-symbol" class="text-2xl text-brand-pink font-bold mt-2">USD</span>
+                            </div>
+                            
+                            <!-- Copy Button -->
+                            <button onclick="copyToClipboard('curr-result')" class="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors opacity-0 group-hover:opacity-100 p-2" title="Copier">
+                                <i class="fa-regular fa-copy text-xl"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2. UNIT CONVERTER -->
+                    <div id="tab-units" class="tab-content">
+                        <!-- Sub-categories -->
+                        <div class="flex justify-center gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
+                            <button onclick="setUnitType('length')" class="unit-type-btn active px-4 py-2 rounded-full border border-white/10 bg-white/5 hover:bg-brand-pink hover:border-brand-pink transition-colors text-sm font-bold whitespace-nowrap">Longueur</button>
+                            <button onclick="setUnitType('weight')" class="unit-type-btn px-4 py-2 rounded-full border border-white/10 bg-white/5 hover:bg-brand-pink hover:border-brand-pink transition-colors text-sm font-bold whitespace-nowrap">Masse</button>
+                            <button onclick="setUnitType('speed')" class="unit-type-btn px-4 py-2 rounded-full border border-white/10 bg-white/5 hover:bg-brand-pink hover:border-brand-pink transition-colors text-sm font-bold whitespace-nowrap">Vitesse</button>
+                            <button onclick="setUnitType('temp')" class="unit-type-btn px-4 py-2 rounded-full border border-white/10 bg-white/5 hover:bg-brand-pink hover:border-brand-pink transition-colors text-sm font-bold whitespace-nowrap">Temp.</button>
+                            <button onclick="setUnitType('data')" class="unit-type-btn px-4 py-2 rounded-full border border-white/10 bg-white/5 hover:bg-brand-pink hover:border-brand-pink transition-colors text-sm font-bold whitespace-nowrap">Data</button>
+                            <button onclick="setUnitType('time')" class="unit-type-btn px-4 py-2 rounded-full border border-white/10 bg-white/5 hover:bg-brand-pink hover:border-brand-pink transition-colors text-sm font-bold whitespace-nowrap">Temps</button>
+                        </div>
+
+                        <div class="flex flex-col md:flex-row gap-4 items-center justify-center mb-8">
+                            <div class="w-full md:w-5/12 bg-black/20 p-4 rounded-2xl border border-white/5">
+                                <input type="number" id="unit-val" value="1" oninput="convertUnit()" class="input-dark w-full px-4 py-2 rounded-lg text-xl font-bold mb-3 text-center bg-transparent border-none focus:ring-0">
+                                <select id="unit-from" onchange="convertUnit()" class="input-dark w-full px-4 py-2 rounded-lg text-sm text-gray-300"></select>
+                            </div>
+
+                            <div class="text-brand-secondary text-2xl rotate-90 md:rotate-0"><i class="fa-solid fa-arrow-right-arrow-left"></i></div>
+
+                            <div class="w-full md:w-5/12 bg-black/20 p-4 rounded-2xl border border-white/5 relative group">
+                                <div id="unit-result-box" class="w-full px-4 py-2 text-xl font-bold text-brand-secondary mb-3 text-center overflow-hidden truncate">...</div>
+                                <select id="unit-to" onchange="convertUnit()" class="input-dark w-full px-4 py-2 rounded-lg text-sm text-gray-300"></select>
+                                
+                                <button onclick="copyToClipboard('unit-result-box')" class="absolute top-2 right-2 text-gray-600 hover:text-brand-secondary transition-colors text-sm">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. FILE CONVERTER (IMAGE) -->
+                    <div id="tab-files" class="tab-content">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold"><i class="fa-solid fa-wand-magic-sparkles mr-2 text-brand-pink"></i>Éditeur Rapide</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- Drop Zone -->
+                            <div class="border-2 border-dashed border-gray-700 hover:border-brand-pink rounded-2xl p-6 transition-all bg-white/5 text-center relative group flex flex-col justify-center h-64" id="drop-zone">
+                                <input type="file" id="file-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleFileSelect(event)">
+                                
+                                <div id="upload-placeholder" class="transition-opacity duration-300">
+                                    <div class="w-16 h-16 bg-brand-pink/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                                        <i class="fa-solid fa-cloud-arrow-up text-2xl text-brand-pink"></i>
+                                    </div>
+                                    <p class="font-bold text-lg">Glissez une image</p>
+                                    <p class="text-xs text-gray-500 mt-1">JPG, PNG, WEBP</p>
+                                </div>
+
+                                <div id="file-preview-container" class="hidden absolute inset-0 p-2 flex flex-col items-center justify-center bg-brand-dark/90 rounded-xl z-20">
+                                    <img id="img-preview" class="h-40 object-contain rounded-lg shadow-lg mb-2 border border-white/20">
+                                    <p id="file-info" class="text-[10px] font-mono text-gray-400 mb-2"></p>
+                                    <button onclick="resetFile()" class="px-3 py-1 bg-red-500/20 text-red-400 text-xs rounded hover:bg-red-500 hover:text-white transition-colors z-30 pointer-events-auto">
+                                        <i class="fa-solid fa-trash mr-1"></i> Supprimer
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Controls -->
+                            <div class="flex flex-col justify-center space-y-6 opacity-50 pointer-events-none transition-all" id="conversion-controls">
+                                
+                                <!-- Format -->
+                                <div>
+                                    <label class="text-xs font-bold text-gray-400 uppercase mb-2 block">Format de sortie</label>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <button onclick="setFormat('image/jpeg')" class="fmt-btn active px-2 py-2 rounded-lg border border-brand-pink bg-brand-pink/20 text-xs font-bold text-white transition-colors">JPG</button>
+                                        <button onclick="setFormat('image/png')" class="fmt-btn px-2 py-2 rounded-lg border border-white/10 bg-white/5 text-xs font-bold text-gray-400 hover:bg-white/10 transition-colors">PNG</button>
+                                        <button onclick="setFormat('image/webp')" class="fmt-btn px-2 py-2 rounded-lg border border-white/10 bg-white/5 text-xs font-bold text-gray-400 hover:bg-white/10 transition-colors">WEBP</button>
+                                    </div>
+                                    <input type="hidden" id="selected-format" value="image/jpeg">
+                                </div>
+
+                                <!-- Quality Slider -->
+                                <div>
+                                    <div class="flex justify-between mb-2">
+                                        <label class="text-xs font-bold text-gray-400 uppercase">Qualité</label>
+                                        <span id="quality-val" class="text-xs font-bold text-brand-pink">90%</span>
+                                    </div>
+                                    <input type="range" id="quality-slider" min="10" max="100" value="90" oninput="updateRangeVal('quality')">
+                                </div>
+
+                                <!-- Resize Slider -->
+                                <div>
+                                    <div class="flex justify-between mb-2">
+                                        <label class="text-xs font-bold text-gray-400 uppercase">Redimensionner</label>
+                                        <span id="scale-val" class="text-xs font-bold text-brand-pink">100%</span>
+                                    </div>
+                                    <input type="range" id="scale-slider" min="10" max="100" value="100" oninput="updateRangeVal('scale')">
+                                </div>
+
+                                <button onclick="processImageConversion()" class="w-full py-3 bg-gradient-to-r from-brand-pink to-brand-secondary text-white font-bold rounded-xl hover:opacity-90 shadow-lg shadow-brand-pink/20 transform hover:translate-y-[-2px] transition-all">
+                                    <i class="fa-solid fa-download mr-2"></i> Télécharger
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            
+            <!-- Footer Note -->
+            <div class="text-center mt-8 text-gray-600 text-sm">
+                &copy; 2024 Freev Convert. 100% Client-Side Secure.
+            </div>
+        </div>
+    </main>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-white text-black px-6 py-2 rounded-full shadow-2xl font-bold text-sm translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
+        <i class="fa-solid fa-check-circle text-green-500"></i> Copié dans le presse-papier !
+    </div>
+
+    <!-- Logic Script -->
+    <script>
+        // --- 0. UTILS ---
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast();
+            });
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2000);
+        }
+
+        // --- TABS ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('text-gray-400');
+            });
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('active');
+            activeBtn.classList.remove('text-gray-400');
+
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        // --- BACKGROUND ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.3;
+                this.vy = (Math.random() - 0.5) * 0.3;
+                this.size = Math.random() * 2 + 0.5;
+                this.color = Math.random() > 0.5 ? '#ec4899' : '#a855f7'; 
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+        for (let i = 0; i < 40; i++) particles.push(new Particle());
+        function animateCanvas() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach((p) => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateCanvas);
+        }
+        animateCanvas();
+
+        // --- 1. CURRENCY ---
+        const rates = {
+            'EUR': 1, 'USD': 1.09, 'GBP': 0.85, 'JPY': 161.50,
+            'CAD': 1.47, 'CHF': 0.95, 'AUD': 1.65, 'CNY': 7.85, 'BTC': 0.000016
+        };
+
+        function swapCurrency() {
+            const from = document.getElementById('curr-from');
+            const to = document.getElementById('curr-to');
+            const temp = from.value;
+            from.value = to.value;
+            to.value = temp;
+            convertCurrency();
+        }
+
+        function convertCurrency() {
+            const amount = parseFloat(document.getElementById('curr-amount').value) || 0;
+            const from = document.getElementById('curr-from').value;
+            const to = document.getElementById('curr-to').value;
+            
+            const result = amount * (rates[to] / rates[from]);
+            
+            let displayResult = result < 0.01 ? result.toExponential(4) : result.toFixed(2);
+            if(to === 'BTC') displayResult = result.toFixed(8);
+
+            document.getElementById('curr-result').innerText = displayResult;
+            document.getElementById('curr-result-symbol').innerText = to;
+        }
+        convertCurrency();
+
+        // --- 2. UNITS ---
+        const unitsData = {
+            'length': {
+                name: 'Longueur',
+                units: {'m': 1, 'km': 1000, 'cm': 0.01, 'ft': 0.3048, 'mi': 1609.34},
+                labels: {'m': 'Mètres', 'km': 'Kilomètres', 'cm': 'Centimètres', 'ft': 'Pieds', 'mi': 'Miles'}
+            },
+            'weight': {
+                name: 'Masse',
+                units: {'kg': 1, 'g': 0.001, 'lb': 0.453592, 'oz': 0.0283495},
+                labels: {'kg': 'Kg', 'g': 'Grammes', 'lb': 'Livres', 'oz': 'Onces'}
+            },
+            'speed': {
+                name: 'Vitesse',
+                units: {'kmh': 1, 'mph': 1.60934, 'ms': 3.6, 'kn': 1.852}, // Base is kmh
+                labels: {'kmh': 'km/h', 'mph': 'mph', 'ms': 'm/s', 'kn': 'Nœuds'}
+            },
+            'time': {
+                name: 'Temps',
+                units: {'s': 1, 'min': 60, 'h': 3600, 'd': 86400},
+                labels: {'s': 'Secondes', 'min': 'Minutes', 'h': 'Heures', 'd': 'Jours'}
+            },
+            'data': {
+                name: 'Données',
+                units: {'MB': 1, 'GB': 1024, 'TB': 1048576},
+                labels: {'MB': 'Mo', 'GB': 'Go', 'TB': 'To'}
+            },
+            'temp': {
+                name: 'Température',
+                units: {},
+                labels: {'C': 'Celsius', 'F': 'Fahrenheit', 'K': 'Kelvin'}
+            }
+        };
+
+        let currentUnitType = 'length';
+
+        function setUnitType(type) {
+            currentUnitType = type;
+            document.querySelectorAll('.unit-type-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-brand-pink', 'border-brand-pink');
+                btn.classList.add('bg-white/5', 'border-white/10');
+            });
+            // Match button
+            const clickedBtn = Array.from(document.querySelectorAll('.unit-type-btn')).find(b => b.onclick.toString().includes(type));
+            if(clickedBtn) {
+                clickedBtn.classList.remove('bg-white/5', 'border-white/10');
+                clickedBtn.classList.add('bg-brand-pink', 'border-brand-pink');
+            }
+
+            const fromSel = document.getElementById('unit-from');
+            const toSel = document.getElementById('unit-to');
+            fromSel.innerHTML = '';
+            toSel.innerHTML = '';
+
+            Object.keys(unitsData[type].labels).forEach(key => {
+                fromSel.innerHTML += `<option value="${key}">${unitsData[type].labels[key]}</option>`;
+                toSel.innerHTML += `<option value="${key}">${unitsData[type].labels[key]}</option>`;
+            });
+
+            // Smart defaults
+            if(type === 'speed') { fromSel.value = 'kmh'; toSel.value = 'mph'; }
+            else if(type === 'time') { fromSel.value = 'min'; toSel.value = 's'; }
+            else { toSel.value = Object.keys(unitsData[type].labels)[1] || Object.keys(unitsData[type].labels)[0]; }
+
+            convertUnit();
+        }
+
+        function convertUnit() {
+            const val = parseFloat(document.getElementById('unit-val').value) || 0;
+            const from = document.getElementById('unit-from').value;
+            const to = document.getElementById('unit-to').value;
+            let res = 0;
+
+            if (currentUnitType === 'temp') {
+                let valInC = val;
+                if(from === 'F') valInC = (val - 32) * 5/9;
+                if(from === 'K') valInC = val - 273.15;
+                if(to === 'C') res = valInC;
+                if(to === 'F') res = (valInC * 9/5) + 32;
+                if(to === 'K') res = valInC + 273.15;
+            } else if (currentUnitType === 'speed') {
+                // Special handling because base unit varies in logic sometimes, but factor method works if base is consistent
+                // Let's use standard factor method: Convert TO base (kmh), then FROM base
+                const factorFrom = unitsData['speed'].units[from]; // value in kmh
+                const factorTo = unitsData['speed'].units[to];
+                
+                // Logic: 1 mph = 1.609 kmh. So 10 mph = 16.09 kmh.
+                // Value * Factor = Value in Base ? No.
+                // Standard Factor: 1 Unit = X Base. 
+                // speed data: kmh=1, mph=1.609. So 1 mph is bigger. 
+                
+                const valInBase = val * unitsData[currentUnitType].units[from];
+                res = valInBase / unitsData[currentUnitType].units[to];
+
+                // Fix for speed specifically if logic is reversed
+                // Actually my speed data is: 1 mph = 1.609 kmh. correct.
+                // But wait: 1 ms = 3.6 kmh. correct.
+                // So logic is: val * factorFrom / factorTo
+            } else {
+                 const factors = unitsData[currentUnitType].units;
+                 const baseVal = val * factors[from];
+                 res = baseVal / factors[to];
+            }
+
+            document.getElementById('unit-result-box').innerText = parseFloat(res.toPrecision(6));
+        }
+        setUnitType('length');
+
+        // --- 3. IMAGES ---
+        let originalFileName = "";
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('img-preview').src = e.target.result;
+                document.getElementById('file-preview-container').classList.remove('hidden');
+                document.getElementById('file-preview-container').classList.add('flex');
+                
+                // Show controls
+                const controls = document.getElementById('conversion-controls');
+                controls.classList.remove('opacity-50', 'pointer-events-none');
+                
+                originalFileName = file.name.split('.')[0];
+                const sizeKB = (file.size / 1024).toFixed(1);
+                document.getElementById('file-info').innerText = `${file.name} (${sizeKB} KB)`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetFile() {
+            document.getElementById('file-input').value = "";
+            document.getElementById('file-preview-container').classList.add('hidden');
+            document.getElementById('file-preview-container').classList.remove('flex');
+            
+            const controls = document.getElementById('conversion-controls');
+            controls.classList.add('opacity-50', 'pointer-events-none');
+        }
+
+        function setFormat(fmt) {
+            document.getElementById('selected-format').value = fmt;
+            document.querySelectorAll('.fmt-btn').forEach(btn => {
+                btn.classList.remove('active', 'border-brand-pink', 'bg-brand-pink/20', 'text-white');
+                btn.classList.add('border-white/10', 'bg-white/5', 'text-gray-400');
+            });
+            // Find button by text or click handler
+            const btns = document.querySelectorAll('.fmt-btn');
+            btns.forEach(b => {
+                if(b.onclick.toString().includes(fmt)) {
+                    b.classList.add('active', 'border-brand-pink', 'bg-brand-pink/20', 'text-white');
+                    b.classList.remove('border-white/10', 'bg-white/5', 'text-gray-400');
+                }
+            });
+        }
+
+        function updateRangeVal(type) {
+            const val = document.getElementById(type + '-slider').value;
+            document.getElementById(type + '-val').innerText = val + '%';
+        }
+
+        function processImageConversion() {
+            const format = document.getElementById('selected-format').value;
+            const quality = parseInt(document.getElementById('quality-slider').value) / 100;
+            const scale = parseInt(document.getElementById('scale-slider').value) / 100;
+            const imgElement = document.getElementById('img-preview');
+            
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const w = imgElement.naturalWidth * scale;
+            const h = imgElement.naturalHeight * scale;
+            
+            canvas.width = w;
+            canvas.height = h;
+
+            // Fill white for JPG transparency handling
+            if (format === 'image/jpeg') {
+                ctx.fillStyle = "#FFFFFF";
+                ctx.fillRect(0, 0, w, h);
+            }
+            
+            // Smooth scaling
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(imgElement, 0, 0, w, h);
+
+            const dataUrl = canvas.toDataURL(format, quality);
+            const ext = format.split('/')[1].replace('jpeg', 'jpg');
+            
+            const link = document.createElement('a');
+            link.download = `Freev_${originalFileName}_${Math.floor(scale*100)}.${ext}`;
+            link.href = dataUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>

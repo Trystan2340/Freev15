@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeMaster V2 | Freev IDE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif'],
+                        mono: ['Courier New', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#0f172a',
+                            primary: '#0ea5e9',
+                            secondary: '#a855f7',
+                            accent: '#22d3ee',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .editor-container {
+            height: calc(100vh - 120px);
+        }
+
+        .code-editor {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            background: #1e293b;
+            color: #e2e8f0;
+            border: none;
+            outline: none;
+            resize: none;
+            padding: 16px 16px 16px 50px;
+            width: 100%;
+            height: 100%;
+            tab-size: 2;
+        }
+
+        .line-numbers {
+            position: absolute;
+            left: 0;
+            top: 0;
+            padding: 16px 8px;
+            background: #0f172a;
+            color: #475569;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            text-align: right;
+            user-select: none;
+            border-right: 1px solid #334155;
+            width: 45px;
+        }
+
+        .preview-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+
+        .tab-button {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab-button.active {
+            background: rgba(14, 165, 233, 0.2);
+            border-bottom: 2px solid #0ea5e9;
+        }
+
+        .tab-button.modified::after {
+            content: '●';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            color: #22d3ee;
+            font-size: 8px;
+        }
+
+        .status-indicator {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+
+        .console-output {
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+
+        .console-log { color: #94a3b8; }
+        .console-error { color: #ef4444; }
+        .console-warn { color: #f59e0b; }
+        .console-info { color: #3b82f6; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .template-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .template-card:hover {
+            transform: translateY(-4px);
+            border-color: #0ea5e9;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0ea5e9;
+            border-radius: 4px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            background: rgba(14, 165, 233, 0.9);
+            backdrop-filter: blur(10px);
+            color: white;
+            font-weight: 600;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Header -->
+    <header class="glass border-b border-white/10">
+        <div class="px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-code text-2xl text-brand-primary"></i>
+                    <span class="text-xl font-heading font-bold">CodeMaster <span class="text-brand-primary">V2</span></span>
+                </div>
+                <div class="hidden md:flex items-center gap-2 text-xs text-gray-400">
+                    <div class="w-2 h-2 rounded-full bg-green-500 status-indicator"></div>
+                    <span id="status-text">Prêt</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <a href="../../reste%20github/freevindex.html" class="px-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm transition-all flex items-center gap-2 text-gray-300 hover:text-white border border-white/10" title="Retour au site Freev">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span class="hidden sm:inline">Retour</span>
+                </a>
+                <button onclick="openTemplates()" class="px-3 py-2 bg-brand-accent/20 hover:bg-brand-accent/30 rounded-lg text-sm transition-all flex items-center gap-2 text-brand-accent">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span class="hidden sm:inline">Templates</span>
+                </button>
+                <button onclick="beautifyCode()" class="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-all" title="Formater le code">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </button>
+                <button onclick="toggleConsole()" class="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-all" title="Console">
+                    <i class="fa-solid fa-terminal"></i>
+                </button>
+                <button onclick="runCode()" class="px-4 py-2 bg-brand-primary hover:bg-brand-primary/80 rounded-lg font-semibold text-sm transition-all flex items-center gap-2 shadow-lg shadow-brand-primary/20">
+                    <i class="fa-solid fa-play"></i>
+                    <span class="hidden sm:inline">Exécuter</span>
+                </button>
+                <button onclick="exportProject()" class="px-4 py-2 bg-brand-secondary hover:bg-brand-secondary/80 rounded-lg font-semibold text-sm transition-all flex items-center gap-2 shadow-lg shadow-brand-secondary/20">
+                    <i class="fa-solid fa-download"></i>
+                </button>
+                <button onclick="clearAll()" class="px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm transition-all">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main IDE Interface -->
+    <div class="editor-container flex flex-col">
+        <div class="flex-1 flex">
+            <!-- Left Panel: Code Editor -->
+            <div class="w-full lg:w-1/2 flex flex-col border-r border-white/10">
+                <!-- File Tabs -->
+                <div class="flex bg-brand-dark border-b border-white/10 overflow-x-auto">
+                    <button onclick="switchTab('html')" id="tab-html" class="tab-button active px-6 py-3 text-sm font-semibold flex items-center gap-2 whitespace-nowrap">
+                        <i class="fa-brands fa-html5 text-orange-500"></i>
+                        index.html
+                    </button>
+                    <button onclick="switchTab('css')" id="tab-css" class="tab-button px-6 py-3 text-sm font-semibold flex items-center gap-2 whitespace-nowrap">
+                        <i class="fa-brands fa-css3-alt text-blue-500"></i>
+                        style.css
+                    </button>
+                    <button onclick="switchTab('js')" id="tab-js" class="tab-button px-6 py-3 text-sm font-semibold flex items-center gap-2 whitespace-nowrap">
+                        <i class="fa-brands fa-js text-yellow-500"></i>
+                        script.js
+                    </button>
+                </div>
+
+                <!-- Code Editor Area -->
+                <div class="flex-1 relative bg-slate-900">
+                    <div id="line-numbers-html" class="line-numbers">1</div>
+                    <textarea id="editor-html" class="code-editor" spellcheck="false" placeholder="<!-- Écrivez votre code HTML ici -->"><!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Projet</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Bienvenue sur CodeMaster V2 ! 🚀</h1>
+        <p>L'IDE le plus puissant pour le web</p>
+        <button onclick="changeColor()">Cliquez-moi</button>
+    </div>
+</body>
+</html></textarea>
+
+                    <div id="line-numbers-css" class="line-numbers hidden">1</div>
+                    <textarea id="editor-css" class="code-editor hidden" spellcheck="false" placeholder="/* Écrivez votre CSS ici */">* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    text-align: center;
+    animation: fadeIn 1s ease-in;
+}
+
+h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+button {
+    padding: 12px 30px;
+    font-size: 1rem;
+    background: white;
+    color: #667eea;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(-20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}</textarea>
+
+                    <div id="line-numbers-js" class="line-numbers hidden">1</div>
+                    <textarea id="editor-js" class="code-editor hidden" spellcheck="false" placeholder="// Écrivez votre JavaScript ici">console.log('🚀 CodeMaster V2 - Démarré avec succès !');
+
+// Fonction interactive
+function changeColor() {
+    const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b'];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    
+    document.body.style.background = `linear-gradient(135deg, ${randomColor} 0%, ${colors[(colors.indexOf(randomColor) + 1) % colors.length]} 100%)`;
+    
+    console.log('✨ Couleur changée : ' + randomColor);
+}
+
+// Événement au chargement
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('📄 Page chargée avec succès');
+});</textarea>
+                </div>
+
+                <!-- Bottom Bar -->
+                <div class="flex justify-between items-center px-4 py-2 bg-brand-dark border-t border-white/10 text-xs text-gray-400">
+                    <div class="flex items-center gap-4">
+                        <span id="char-count">0 caractères</span>
+                        <span id="line-count">0 lignes</span>
+                        <span class="text-green-400" id="saved-indicator"></span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span>Ctrl+S: Exécuter | Ctrl+E: Exporter</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Live Preview -->
+            <div class="hidden lg:flex w-1/2 flex-col">
+                <div class="flex items-center justify-between px-6 py-3 bg-brand-dark border-b border-white/10">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-eye text-brand-accent"></i>
+                        <span class="font-semibold text-sm">Aperçu en direct</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="togglePreview()" class="text-xs px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                        <button onclick="openInNewTab()" class="text-xs px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors">
+                            <i class="fa-solid fa-external-link-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex-1 bg-gray-100">
+                    <iframe id="preview" class="preview-frame"></iframe>
+                </div>
+            </div>
+        </div>
+
+        <!-- Console Panel (Toggle) -->
+        <div id="console-panel" class="hidden border-t border-white/10 bg-brand-dark">
+            <div class="flex justify-between items-center px-4 py-2 border-b border-white/10">
+                <div class="flex items-center gap-2 text-sm font-semibold">
+                    <i class="fa-solid fa-terminal text-green-400"></i>
+                    Console
+                </div>
+                <button onclick="clearConsole()" class="text-xs px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded">
+                    Effacer
+                </button>
+            </div>
+            <div id="console-output" class="console-output p-4 font-mono"></div>
+        </div>
+    </div>
+
+    <!-- Templates Modal -->
+    <div id="templates-modal" class="modal">
+        <div class="bg-brand-dark border border-white/20 rounded-2xl p-8 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-heading font-bold">Choisir un Template</h2>
+                <button onclick="closeTemplates()" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-times text-2xl"></i>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Template 1: Blank -->
+                <div class="template-card glass p-6 rounded-xl border border-white/10" onclick="loadTemplate('blank')">
+                    <div class="text-3xl mb-3">📄</div>
+                    <h3 class="font-bold mb-2">Vide</h3>
+                    <p class="text-sm text-gray-400">Commencer de zéro</p>
+                </div>
+
+                <!-- Template 2: Landing Page -->
+                <div class="template-card glass p-6 rounded-xl border border-white/10" onclick="loadTemplate('landing')">
+                    <div class="text-3xl mb-3">🚀</div>
+                    <h3 class="font-bold mb-2">Landing Page</h3>
+                    <p class="text-sm text-gray-400">Page de présentation moderne</p>
+                </div>
+
+                <!-- Template 3: Portfolio -->
+                <div class="template-card glass p-6 rounded-xl border border-white/10" onclick="loadTemplate('portfolio')">
+                    <div class="text-3xl mb-3">💼</div>
+                    <h3 class="font-bold mb-2">Portfolio</h3>
+                    <p class="text-sm text-gray-400">Présentez vos projets</p>
+                </div>
+
+                <!-- Template 4: Blog -->
+                <div class="template-card glass p-6 rounded-xl border border-white/10" onclick="loadTemplate('blog')">
+                    <div class="text-3xl mb-3">✍️</div>
+                    <h3 class="font-bold mb-2">Article Blog</h3>
+                    <p class="text-sm text-gray-400">Format article avec style</p>
+                </div>
+
+                <!-- Template 5: Game -->
+                <div class="template-card glass p-6 rounded-xl border border-white/10" onclick="loadTemplate('game')">
+                    <div class="text-3xl mb-3">🎮</div>
+                    <h3 class="font-bold mb-2">Mini Jeu</h3>
+                    <p class="text-sm text-gray-400">Clicker game simple</p>
+                </div>
+
+                <!-- Template 6: Form -->
+                <div class="template-card glass p-6 rounded-xl border border-white/10" onclick="loadTemplate('form')">
+                    <div class="text-3xl mb-3">📝</div>
+                    <h3 class="font-bold mb-2">Formulaire</h3>
+                    <p class="text-sm text-gray-400">Formulaire de contact stylé</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== STATE MANAGEMENT =====
+        let currentTab = 'html';
+        let autoSaveTimer = null;
+        const originalCode = {};
+        
+        const editors = {
+            html: document.getElementById('editor-html'),
+            css: document.getElementById('editor-css'),
+            js: document.getElementById('editor-js')
+        };
+
+        const lineNumbers = {
+            html: document.getElementById('line-numbers-html'),
+            css: document.getElementById('line-numbers-css'),
+            js: document.getElementById('line-numbers-js')
+        };
+
+        // Store original code
+        Object.keys(editors).forEach(key => {
+            originalCode[key] = editors[key].value;
+        });
+
+        // ===== CONSOLE OVERRIDE =====
+        const originalConsole = {
+            log: console.log,
+            error: console.error,
+            warn: console.warn,
+            info: console.info
+        };
+
+        function addToConsole(message, type = 'log') {
+            const consoleOutput = document.getElementById('console-output');
+            const time = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.className = `console-${type} py-1`;
+            div.textContent = `[${time}] ${message}`;
+            consoleOutput.appendChild(div);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        // ===== TAB MANAGEMENT =====
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            
+            Object.keys(editors).forEach(key => {
+                editors[key].classList.add('hidden');
+                lineNumbers[key].classList.add('hidden');
+            });
+            editors[tab].classList.remove('hidden');
+            lineNumbers[tab].classList.remove('hidden');
+            
+            updateStats();
+            updateLineNumbers();
+        }
+
+        // ===== LINE NUMBERS =====
+        function updateLineNumbers() {
+            const content = editors[currentTab].value;
+            const lines = content.split('\n').length;
+            lineNumbers[currentTab].innerHTML = Array.from({length: lines}, (_, i) => i + 1).join('\n');
+        }
+
+        // ===== RUN CODE =====
+        function runCode() {
+            const htmlCode = editors.html.value;
+            const cssCode = editors.css.value;
+            const jsCode = editors.js.value;
+            
+            const fullCode = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <style>${cssCode}</style>
+                </head>
+                <body>
+                    ${htmlCode.replace(/<!DOCTYPE html>|<html.*?>|<\/html>|<head>.*?<\/head>|<body>|<\/body>/gi, '')}
+                    <script>
+                        // Override console methods
+                        window.console = {
+                            log: (msg) => { window.parent.postMessage({type: 'log', message: msg}, '*'); },
+                            error: (msg) => { window.parent.postMessage({type: 'error', message: msg}, '*'); },
+                            warn: (msg) => { window.parent.postMessage({type: 'warn', message: msg}, '*'); },
+                            info: (msg) => { window.parent.postMessage({type: 'info', message: msg}, '*'); }
+                        };
+                        
+                        // Catch errors
+                        window.onerror = function(msg, url, line) {
+                            window.parent.postMessage({type: 'error', message: 'Erreur ligne ' + line + ': ' + msg}, '*');
+                            return true;
+                        };
+                        
+                        ${jsCode}
+                    <\/script>
+                </body>
+                </html>
+            `;
+            
+            const preview = document.getElementById('preview');
+            preview.srcdoc = fullCode;
+            
+            showNotification('✓ Code exécuté avec succès');
+            updateStatus('Exécuté', 'green');
+        }
+
+        // Listen for console messages from iframe
+        window.addEventListener('message', (event) => {
+            if (event.data.type) {
+                addToConsole(event.data.message, event.data.type);
+            }
+        });
+
+        // ===== EXPORT PROJECT =====
+        function exportProject() {
+            const htmlContent = editors.html.value;
+            const cssContent = editors.css.value;
+            const jsContent = editors.js.value;
+            
+            const completeHTML = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Projet CodeMaster</title>
+    <style>
+${cssContent}
+    </style>
+</head>
+<body>
+${htmlContent.replace(/<!DOCTYPE html>|<html.*?>|<\/html>|<head>.*?<\/head>|<body>|<\/body>/gi, '')}
+    <script>
+${jsContent}
+    <\/script>
+</body>
+</html>`;
+            
+            const blob = new Blob([completeHTML], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'projet-codemaster-' + Date.now() + '.html';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('✓ Projet exporté !');
+        }
+
+        // ===== BEAUTIFY CODE =====
+        function beautifyCode() {
+            const editor = editors[currentTab];
+            let code = editor.value;
+            
+            if (currentTab === 'html') {
+                code = code.replace(/></g, '>\n<');
+            } else if (currentTab === 'css') {
+                code = code.replace(/;/g, ';\n').replace(/{/g, ' {\n').replace(/}/g, '\n}\n');
+            }
+            
+            editor.value = code;
+            updateLineNumbers();
+            showNotification('✨ Code formaté');
+        }
+
+        // ===== CLEAR ALL =====
+        function clearAll() {
+            if (confirm('Êtes-vous sûr de vouloir tout effacer ?')) {
+                editors.html.value = '<!DOCTYPE html>\n<html lang="fr">\n<head>\n    <meta charset="UTF-8">\n    <title>Document</title>\n</head>\n<body>\n    \n</body>\n</html>';
+                editors.css.value = '';
+                editors.js.value = '';
+                runCode();
+                updateStats();
+                updateLineNumbers();
+                showNotification('🗑️ Tout effacé');
+            }
+        }
+
+        // ===== CONSOLE TOGGLE =====
+        function toggleConsole() {
+            const panel = document.getElementById('console-panel');
+            panel.classList.toggle('hidden');
+        }
+
+        function clearConsole() {
+            document.getElementById('console-output').innerHTML = '';
+        }
+
+        // ===== TEMPLATES =====
+        function openTemplates() {
+            document.getElementById('templates-modal').classList.add('active');
+        }
+
+        function closeTemplates() {
+            document.getElementById('templates-modal').classList.remove('active');
+        }
+
+        const templates = {
+            blank: {
+                html: '<!DOCTYPE html>\n<html lang="fr">\n<head>\n    <meta charset="UTF-8">\n    <title>Document</title>\n</head>\n<body>\n    \n</body>\n</html>',
+                css: '',
+                js: ''
+            },
+            landing: {
+                html: `<div class="hero">
+    <h1>Bienvenue sur mon site</h1>
+    <p>Découvrez nos services exceptionnels</p>
+    <button>En savoir plus</button>
+</div>`,
+                css: `body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.hero {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+button {
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    background: white;
+    color: #667eea;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    margin-top: 2rem;
+}`,
+                js: `console.log('Landing page chargée !');`
+            },
+            portfolio: {
+                html: `<nav>
+    <h2>Mon Portfolio</h2>
+</nav>
+<section class="projects">
+    <div class="project-card">
+        <h3>Projet 1</h3>
+        <p>Description du projet</p>
+    </div>
+    <div class="project-card">
+        <h3>Projet 2</h3>
+        <p>Description du projet</p>
+    </div>
+</section>`,
+                css: `* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+}
+
+nav {
+    padding: 2rem;
+    background: #1e293b;
+    text-align: center;
+}
+
+.projects {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 3rem;
+}
+
+.project-card {
+    background: #1e293b;
+    padding: 2rem;
+    border-radius: 12px;
+    transition: transform 0.3s;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+}`,
+                js: `console.log('Portfolio chargé !');`
+            },
+            blog: {
+                html: `<article>
+    <header>
+        <h1>Mon Article de Blog</h1>
+        <p class="date">1er janvier 2024</p>
+    </header>
+    <section class="content">
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+    </section>
+</article>`,
+                css: `body {
+    font-family: Georgia, serif;
+    background: #f9fafb;
+    color: #1f2937;
+    line-height: 1.6;
+}
+
+article {
+    max-width: 700px;
+    margin: 3rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.date {
+    color: #6b7280;
+    font-style: italic;
+}
+
+.content {
+    margin-top: 2rem;
+}`,
+                js: `console.log('Article chargé !');`
+            },
+            game: {
+                html: `<div class="game">
+    <h1>Clicker Game 🎮</h1>
+    <div class="score">Score: <span id="score">0</span></div>
+    <button id="clickBtn">CLIQUEZ-MOI !</button>
+</div>`,
+                css: `body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.game {
+    text-align: center;
+    color: white;
+}
+
+h1 {
+    font-size: 3rem;
+    margin-bottom: 2rem;
+}
+
+.score {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+
+#clickBtn {
+    padding: 20px 50px;
+    font-size: 1.5rem;
+    background: white;
+    color: #667eea;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+#clickBtn:active {
+    transform: scale(0.95);
+}`,
+                js: `let score = 0;
+const scoreEl = document.getElementById('score');
+const btn = document.getElementById('clickBtn');
+
+btn.addEventListener('click', () => {
+    score++;
+    scoreEl.textContent = score;
+    console.log('Score: ' + score);
+});`
+            },
+            form: {
+                html: `<div class="form-container">
+    <h2>Contactez-nous</h2>
+    <input type="text" placeholder="Votre nom">
+    <input type="email" placeholder="Votre email">
+    <textarea placeholder="Votre message"></textarea>
+    <button>Envoyer</button>
+</div>`,
+                css: `body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.form-container {
+    background: white;
+    padding: 3rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    width: 400px;
+}
+
+h2 {
+    margin-top: 0;
+    color: #667eea;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+textarea {
+    height: 120px;
+    resize: vertical;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+}`,
+                js: `document.querySelector('button').addEventListener('click', () => {
+    alert('Formulaire envoyé !');
+    console.log('Formulaire soumis');
+});`
+            }
+        };
+
+        function loadTemplate(name) {
+            const template = templates[name];
+            if (template) {
+                editors.html.value = template.html;
+                editors.css.value = template.css;
+                editors.js.value = template.js;
+                
+                closeTemplates();
+                runCode();
+                updateStats();
+                updateLineNumbers();
+                showNotification('✓ Template chargé: ' + name);
+            }
+        }
+
+        // ===== UTILITIES =====
+        function updateStats() {
+            const content = editors[currentTab].value;
+            const chars = content.length;
+            const lines = content.split('\n').length;
+            
+            document.getElementById('char-count').textContent = `${chars} caractères`;
+            document.getElementById('line-count').textContent = `${lines} lignes`;
+            
+            // Check if modified
+            const isModified = content !== originalCode[currentTab];
+            const tab = document.getElementById(`tab-${currentTab}`);
+            if (isModified) {
+                tab.classList.add('modified');
+            } else {
+                tab.classList.remove('modified');
+            }
+        }
+
+        function updateStatus(text, color) {
+            const statusText = document.getElementById('status-text');
+            statusText.textContent = text;
+            statusText.parentElement.querySelector('.w-2').style.background = color;
+            
+            setTimeout(() => {
+                statusText.textContent = 'Prêt';
+                statusText.parentElement.querySelector('.w-2').style.background = '#22c55e';
+            }, 2000);
+        }
+
+        function showNotification(message) {
+            const notif = document.getElementById('notification');
+            notif.textContent = message;
+            notif.classList.add('show');
+            
+            setTimeout(() => {
+                notif.classList.remove('show');
+            }, 2000);
+        }
+
+        function togglePreview() {
+            runCode();
+        }
+
+        function openInNewTab() {
+            const htmlCode = editors.html.value;
+            const cssCode = editors.css.value;
+            const jsCode = editors.js.value;
+            
+            const fullCode = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${cssCode}</style></head><body>${htmlCode.replace(/<!DOCTYPE html>|<html.*?>|<\/html>|<head>.*?<\/head>|<body>|<\/body>/gi, '')}<script>${jsCode}<\/script></body></html>`;
+            
+            const blob = new Blob([fullCode], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+        }
+
+        // ===== EVENT LISTENERS =====
+        Object.keys(editors).forEach(key => {
+            editors[key].addEventListener('input', () => {
+                updateStats();
+                updateLineNumbers();
+                
+                clearTimeout(window.autoUpdateTimeout);
+                window.autoUpdateTimeout = setTimeout(() => {
+                    runCode();
+                }, 800);
+            });
+            
+            editors[key].addEventListener('keydown', (e) => {
+                if (e.key === 'Tab') {
+                    e.preventDefault();
+                    const start = e.target.selectionStart;
+                    const end = e.target.selectionEnd;
+                    e.target.value = e.target.value.substring(0, start) + '  ' + e.target.value.substring(end);
+                    e.target.selectionStart = e.target.selectionEnd = start + 2;
+                    updateLineNumbers();
+                }
+            });
+            
+            editors[key].addEventListener('scroll', () => {
+                lineNumbers[key].scrollTop = editors[key].scrollTop;
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                runCode();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+                e.preventDefault();
+                exportProject();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+                e.preventDefault();
+                beautifyCode();
+            }
+        });
+
+        // ===== INITIAL LOAD =====
+        window.addEventListener('load', () => {
+            runCode();
+            updateStats();
+            updateLineNumbers();
+            showNotification('🚀 CodeMaster V2 prêt !');
+        });
+    </script>
+</body>
+</html>

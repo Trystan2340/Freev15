@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freev Sketch Pro | Studio de Création</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#0f172a',
+                            primary: '#0ea5e9', 
+                            secondary: '#a855f7',
+                            accent: '#22d3ee',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .glass-ui {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-freev {
+            background: linear-gradient(135deg, #0ea5e9 0%, #a855f7 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-freev:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.5);
+        }
+
+        .tool-icon {
+            @apply flex items-center justify-center rounded-xl cursor-pointer border border-white/5 text-slate-400 bg-white/5 transition-all duration-200;
+        }
+
+        .tool-icon:hover {
+            @apply border-brand-primary/50 bg-white/10 text-white scale-105;
+        }
+
+        .tool-icon.active {
+            @apply bg-brand-primary text-white border-brand-primary shadow-lg shadow-brand-primary/30 scale-110;
+        }
+
+        #sketch-canvas {
+            cursor: none;
+            touch-action: none;
+            background-color: transparent;
+        }
+
+        #custom-cursor {
+            width: 24px; height: 24px;
+            border: 2px solid #0ea5e9;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, background 0.2s;
+            background: rgba(14, 165, 233, 0.15);
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.3);
+        }
+
+        #three-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            z-index: 5;
+            cursor: grab;
+        }
+
+        .canvas-container {
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 32px 32px;
+        }
+        
+        .bg-grid { background-size: 32px 32px; background-image: linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px); }
+        .bg-dark { background: #0f172a; }
+        .bg-black-solid { background: #000000; }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+
+    <div id="custom-cursor"></div>
+
+    <!-- Header -->
+    <header class="w-full z-50 glass-ui border-b border-white/10">
+        <div class="px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-lg btn-freev flex items-center justify-center shadow-lg group">
+                    <i class="fa-solid fa-wand-magic-sparkles text-white group-hover:rotate-12 transition-transform"></i>
+                </div>
+                <h1 class="text-xl font-heading font-extrabold tracking-tight">
+                    FREEV <span class="text-brand-primary">SKETCH PRO</span>
+                </h1>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <a href="../../reste%20github/freevindex.html" class="w-10 h-10 rounded-lg flex items-center justify-center bg-white/5 text-slate-400 hover:text-white transition-all border border-white/5" title="Retour au site Freev">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <button onclick="downloadImage()" class="w-10 h-10 rounded-lg flex items-center justify-center bg-white/5 text-slate-400 hover:text-brand-accent transition-all border border-white/5" title="Télécharger">
+                    <i class="fa-solid fa-download"></i>
+                </button>
+                <button onclick="toggleSymmetry()" id="btn-symmetry" class="w-10 h-10 rounded-lg flex items-center justify-center bg-white/5 text-slate-400 hover:text-white transition-all border border-white/5" title="Symétrie Miroir">
+                    <i class="fa-solid fa-arrows-left-right"></i>
+                </button>
+                <button id="toggle-3d" onclick="toggle3D()" class="btn-freev px-6 py-2 rounded-full text-white font-bold text-xs uppercase tracking-widest shadow-lg">
+                    <i class="fa-solid fa-vr-cardboard mr-2"></i> Mode 3D
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 relative flex overflow-hidden">
+        <!-- Barre latérale Gauche : Outils -->
+        <aside class="w-20 glass-ui border-r border-white/10 flex flex-col items-center py-6 gap-4 z-10">
+            <div id="tool-pencil" onclick="setTool('pencil')" class="tool-icon w-12 h-12 active" title="Crayon"><i class="fa-solid fa-pencil"></i></div>
+            <div id="tool-neon" onclick="setTool('neon')" class="tool-icon w-12 h-12" title="Néon Glow"><i class="fa-solid fa-sun"></i></div>
+            <div id="tool-magic" onclick="setTool('magic')" class="tool-icon w-12 h-12" title="Pinceau Flou"><i class="fa-solid fa-cloud"></i></div>
+            <div id="tool-eraser" onclick="setTool('eraser')" class="tool-icon w-12 h-12 text-rose-500" title="Gomme"><i class="fa-solid fa-eraser"></i></div>
+            
+            <div class="w-8 h-px bg-white/10 my-2"></div>
+            
+            <div class="flex flex-col gap-3" id="color-palette"></div>
+            <!-- Sélecteur libre -->
+            <input type="color" id="color-picker" oninput="setCustomColor(this.value)" class="w-8 h-8 rounded-full border-0 p-0 cursor-pointer overflow-hidden bg-transparent">
+            
+            <button onclick="undo()" class="mt-auto w-10 h-10 rounded-lg hover:bg-white/10 text-slate-400 transition-all border border-white/5">
+                <i class="fa-solid fa-rotate-left"></i>
+            </button>
+        </aside>
+
+        <!-- Zone de Dessin -->
+        <section class="flex-1 relative canvas-container" id="workspace">
+            <div id="three-container"></div>
+            <canvas id="sketch-canvas"></canvas>
+
+            <!-- Barre de contrôle basse -->
+            <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 w-full max-w-2xl px-4 flex gap-4">
+                <!-- Taille -->
+                <div class="glass-ui p-4 rounded-2xl flex-1 flex items-center gap-6 shadow-2xl">
+                    <div class="flex-1 flex flex-col gap-1">
+                        <div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+                            <span>Épaisseur</span>
+                            <span id="size-val" class="text-brand-primary">12px</span>
+                        </div>
+                        <input type="range" min="2" max="150" value="12" oninput="updateSize(this.value)" class="w-full h-1.5 bg-slate-800 rounded-full appearance-none accent-brand-primary cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- Arrière-plans -->
+                <div class="glass-ui p-4 rounded-2xl flex items-center gap-3 shadow-2xl">
+                    <button onclick="changeBG('grid')" class="w-8 h-8 rounded bg-slate-800 border border-white/10 text-[10px] hover:border-brand-primary">G</button>
+                    <button onclick="changeBG('dark')" class="w-8 h-8 rounded bg-slate-900 border border-white/10 text-[10px] hover:border-brand-primary">D</button>
+                    <button onclick="changeBG('black')" class="w-8 h-8 rounded bg-black border border-white/10 text-[10px] hover:border-brand-primary">B</button>
+                    <div class="w-px h-6 bg-white/10 mx-1"></div>
+                    <button onclick="clearCanvas()" class="text-rose-500 font-bold text-[10px] uppercase px-2">Reset</button>
+                </div>
+            </div>
+
+            <!-- Panel 3D -->
+            <div id="panel-3d" class="hidden absolute right-6 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                <div class="glass-ui p-5 rounded-3xl w-52 border-l-4 border-brand-primary shadow-2xl">
+                    <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-4">Morphologie 3D</h3>
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        <button onclick="changeShape('Box')" class="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-brand-primary transition-all flex items-center justify-center" id="btn-Box"><i class="fa-solid fa-cube text-lg"></i></button>
+                        <button onclick="changeShape('Sphere')" class="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-brand-primary transition-all flex items-center justify-center" id="btn-Sphere"><i class="fa-solid fa-circle text-lg"></i></button>
+                        <button onclick="changeShape('Torus')" class="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-brand-primary transition-all flex items-center justify-center" id="btn-Torus"><i class="fa-solid fa-dot-circle text-lg"></i></button>
+                        <button onclick="changeShape('Ico')" class="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-brand-primary transition-all flex items-center justify-center" id="btn-Ico"><i class="fa-solid fa-gem text-lg"></i></button>
+                    </div>
+
+                    <div class="flex flex-col gap-4">
+                        <div>
+                            <div class="flex justify-between text-[9px] font-bold text-slate-500 uppercase mb-2">Rotation</div>
+                            <input type="range" min="0" max="100" value="15" oninput="updateRotationSpeed(this.value)" class="w-full h-1 bg-slate-800 appearance-none accent-brand-secondary">
+                        </div>
+                        <button onclick="resetCamera()" class="w-full py-3 rounded-xl bg-brand-primary/10 text-brand-primary text-[10px] font-bold uppercase border border-brand-primary/20 hover:bg-brand-primary/25 transition-all">Recentrer</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('sketch-canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const workspace = document.getElementById('workspace');
+        const cursor = document.getElementById('custom-cursor');
+        const threeContainer = document.getElementById('three-container');
+        
+        let drawing = false, is3DMode = false, isSymmetry = false;
+        let currentTool = 'pencil', color = '#0ea5e9', brushSize = 12, history = [];
+        let rotSpeed = 0.003, isDragging = false, prevX = 0, prevY = 0;
+
+        // Palette Init
+        const colors = ['#0ea5e9', '#a855f7', '#22d3ee', '#ffffff', '#f43f5e', '#10b981'];
+        const palette = document.getElementById('color-palette');
+        colors.forEach(c => {
+            const div = document.createElement('div');
+            div.className = 'w-8 h-8 rounded-full cursor-pointer border-2 border-transparent transition-all hover:scale-125';
+            div.style.backgroundColor = c;
+            if(c === '#0ea5e9') div.style.borderColor = 'white';
+            div.onclick = () => setCustomColor(c, div);
+            palette.appendChild(div);
+        });
+
+        function setCustomColor(c, el = null) {
+            color = c;
+            cursor.style.borderColor = c;
+            cursor.style.background = c + '26';
+            cursor.style.boxShadow = `0 0 15px ${c}4d`;
+            document.querySelectorAll('#color-palette div').forEach(d => d.style.borderColor = 'transparent');
+            if(el) el.style.borderColor = 'white';
+            if(mesh) mesh.material.emissive = new THREE.Color(c).multiplyScalar(0.2);
+        }
+
+        function changeBG(type) {
+            workspace.className = "flex-1 relative canvas-container " + 
+                (type === 'grid' ? 'bg-grid' : type === 'dark' ? 'bg-dark' : 'bg-black-solid');
+        }
+
+        // --- Three.js Logic ---
+        let scene, camera, renderer, mesh, texture, pivot;
+
+        function init3D() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(45, workspace.clientWidth / workspace.clientHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(workspace.clientWidth, workspace.clientHeight);
+            threeContainer.appendChild(renderer.domElement);
+
+            pivot = new THREE.Group();
+            scene.add(pivot);
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+            const pointLight = new THREE.PointLight(0xffffff, 1);
+            pointLight.position.set(10, 20, 10);
+            scene.add(pointLight);
+
+            texture = new THREE.CanvasTexture(canvas);
+            texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+            
+            changeShape('Box');
+            camera.position.z = 8;
+
+            threeContainer.addEventListener('mousedown', (e) => { isDragging = true; });
+            window.addEventListener('mouseup', () => { isDragging = false; });
+            threeContainer.addEventListener('mousemove', (e) => {
+                if(isDragging) {
+                    pivot.rotation.y += (e.clientX - prevX) * 0.01;
+                    pivot.rotation.x += (e.clientY - prevY) * 0.01;
+                }
+                prevX = e.clientX; prevY = e.clientY;
+            });
+            threeContainer.addEventListener('wheel', (e) => {
+                camera.position.z = Math.max(3, Math.min(20, camera.position.z + e.deltaY * 0.01));
+            }, {passive: true});
+
+            animate3D();
+        }
+
+        function changeShape(type) {
+            if (mesh) pivot.remove(mesh);
+            document.querySelectorAll('#panel-3d button').forEach(b => b.classList.remove('border-brand-primary', 'bg-brand-primary/20'));
+            document.getElementById(`btn-${type}`).classList.add('border-brand-primary', 'bg-brand-primary/20');
+
+            let geo;
+            switch(type) {
+                case 'Sphere': geo = new THREE.SphereGeometry(2.4, 64, 64); break;
+                case 'Torus': geo = new THREE.TorusGeometry(1.8, 0.6, 32, 100); break;
+                case 'Ico': geo = new THREE.IcosahedronGeometry(2.6, 0); break;
+                default: geo = new THREE.BoxGeometry(2.8, 2.8, 2.8);
+            }
+
+            const mat = new THREE.MeshStandardMaterial({ 
+                map: texture, 
+                roughness: 0.2, 
+                metalness: 0.5,
+                emissive: new THREE.Color(color).multiplyScalar(0.15),
+                emissiveMap: texture
+            });
+            mesh = new THREE.Mesh(geo, mat);
+            pivot.add(mesh);
+        }
+
+        function animate3D() {
+            if (!is3DMode) return;
+            requestAnimationFrame(animate3D);
+            if(!isDragging) pivot.rotation.y += rotSpeed;
+            texture.needsUpdate = true;
+            renderer.render(scene, camera);
+        }
+
+        function toggle3D() {
+            is3DMode = !is3DMode;
+            const btn = document.getElementById('toggle-3d');
+            const panel = document.getElementById('panel-3d');
+            
+            if (is3DMode) {
+                btn.innerHTML = '<i class="fa-solid fa-pen-nib mr-2"></i> Dessin 2D';
+                btn.className = "px-6 py-2 rounded-full bg-white text-brand-dark font-bold text-xs uppercase tracking-widest shadow-lg hover:bg-slate-100 transition-all";
+                threeContainer.style.display = 'block';
+                panel.classList.remove('hidden');
+                cursor.style.display = 'none';
+                if (!scene) init3D();
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-vr-cardboard mr-2"></i> Mode 3D';
+                btn.className = "btn-freev px-6 py-2 rounded-full text-white font-bold text-xs uppercase tracking-widest shadow-lg";
+                threeContainer.style.display = 'none';
+                panel.classList.add('hidden');
+                cursor.style.display = 'block';
+            }
+        }
+
+        // --- Canvas Drawing ---
+        function resize() {
+            const data = canvas.toDataURL();
+            canvas.width = workspace.clientWidth;
+            canvas.height = workspace.clientHeight;
+            const img = new Image();
+            img.src = data;
+            img.onload = () => ctx.drawImage(img, 0, 0);
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function setTool(t) {
+            currentTool = t;
+            document.querySelectorAll('.tool-icon').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tool-${t}`).classList.add('active');
+            
+            // Cursor style update
+            if(t === 'eraser') {
+                cursor.style.borderRadius = "4px";
+            } else {
+                cursor.style.borderRadius = "50%";
+            }
+        }
+
+        function updateSize(s) { 
+            brushSize = s; 
+            document.getElementById('size-val').innerText = s + 'px';
+            cursor.style.width = (s/2 + 20) + 'px';
+            cursor.style.height = (s/2 + 20) + 'px';
+        }
+
+        function updateRotationSpeed(s) { rotSpeed = s / 5000; }
+
+        function toggleSymmetry() {
+            isSymmetry = !isSymmetry;
+            document.getElementById('btn-symmetry').classList.toggle('text-brand-primary', isSymmetry);
+            document.getElementById('btn-symmetry').classList.toggle('bg-brand-primary/10', isSymmetry);
+        }
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: (e.touches ? e.touches[0].clientX : e.clientX) - rect.left,
+                y: (e.touches ? e.touches[0].clientY : e.clientY) - rect.top
+            };
+        }
+
+        function start(e) {
+            if (is3DMode) return;
+            drawing = true;
+            saveHistory();
+            const pos = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        }
+
+        function draw(e) {
+            const pos = getPos(e);
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+
+            if (!drawing || is3DMode) return;
+
+            ctx.lineWidth = brushSize;
+            ctx.strokeStyle = currentTool === 'eraser' ? (workspace.classList.contains('bg-black-solid') ? '#000000' : '#0f172a') : color;
+            ctx.shadowBlur = 0;
+
+            if (currentTool === 'neon') {
+                ctx.shadowBlur = brushSize;
+                ctx.shadowColor = color;
+            } else if (currentTool === 'magic') {
+                ctx.globalAlpha = 0.1;
+                ctx.lineWidth = brushSize * 3;
+            } else {
+                ctx.globalAlpha = 1.0;
+            }
+
+            const drawStep = (x, y) => {
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+            };
+
+            drawStep(pos.x, pos.y);
+            if (isSymmetry) drawStep(canvas.width - pos.x, pos.y);
+        }
+
+        function stop() { drawing = false; ctx.beginPath(); ctx.globalAlpha = 1.0; }
+
+        canvas.addEventListener('mousedown', start);
+        window.addEventListener('mousemove', draw);
+        window.addEventListener('mouseup', stop);
+
+        function saveHistory() {
+            history.push(canvas.toDataURL());
+            if (history.length > 25) history.shift();
+        }
+
+        function undo() {
+            if (history.length > 0) {
+                const img = new Image();
+                img.src = history.pop();
+                img.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                };
+            }
+        }
+
+        function clearCanvas() {
+            if(confirm("Voulez-vous tout effacer ?")) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                history = [];
+            }
+        }
+
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'freev-sketch-creation.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        function resetCamera() {
+            if(camera) {
+                camera.position.z = 8;
+                pivot.rotation.set(0,0,0);
+            }
+        }
+
+        setTool('pencil');
+    </script>
+</body>
+</html>

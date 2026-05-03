@@ -1,0 +1,24 @@
+{
+  "name": "Freev",
+  "short_name": "Freev",
+  "description": "L'Univers Digital Sans Limites par Trystan2340",
+  "start_url": "https://trystan2340.github.io/Freev/",
+  "scope": "https://trystan2340.github.io/Freev/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0ea5e9",
+  "icons": [
+    {
+      "src": "https://trystan2340.github.io/Freev/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://trystan2340.github.io/Freev/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
