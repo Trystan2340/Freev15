@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tower Block 3D</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-top: #D7D2CC;
+            --bg-bottom: #304352;
+            --ui-color: #2c3e50;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom));
+            font-family: 'Montserrat', sans-serif;
+            touch-action: none; /* Empêche le zoom/scroll sur mobile */
+            user-select: none;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Interface Utilisateur */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #score-container {
+            position: absolute;
+            top: 15%;
+            font-size: 5rem;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.8);
+            text-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+        }
+
+        #start-screen, #game-over-screen {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            pointer-events: auto;
+            max-width: 80%;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5rem;
+            color: var(--ui-color);
+        }
+
+        p {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        button {
+            background: var(--ui-color);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            box-shadow: 0 5px 15px rgba(44, 62, 80, 0.3);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            background: #34495e;
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .hidden {
+            display: none !important;
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .visible {
+            display: block !important;
+            opacity: 1;
+            animation: fadeIn 0.3s forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Petit footer discret */
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- Bouton Retour Freev -->
+    <a href="../../reste%20github/freevindex.html" id="freev-back-btn" style="position:fixed;top:14px;left:14px;z-index:9999;display:flex;align-items:center;gap:7px;padding:7px 14px;background:rgba(15,23,42,0.85);border:1px solid rgba(255,255,255,0.15);border-radius:999px;color:#cbd5e1;font-family:sans-serif;font-size:12px;font-weight:600;text-decoration:none;backdrop-filter:blur(10px);transition:all 0.2s ease;" onmouseover="this.style.color='#fff';this.style.borderColor='rgba(34,211,238,0.6)';this.style.boxShadow='0 0 14px rgba(34,211,238,0.25)'" onmouseout="this.style.color='#cbd5e1';this.style.borderColor='rgba(255,255,255,0.15)';this.style.boxShadow='none'">&#8592; Retour</a>
+
+    <div id="ui-layer">
+        <div id="score-container" class="hidden">0</div>
+
+        <div id="start-screen">
+            <h1>TOWER BLOCK</h1>
+            <p>Empilez les blocs le plus haut possible.<br>Cliquez ou tapez pour placer un bloc.</p>
+            <button onclick="startGame()">JOUER</button>
+        </div>
+
+        <div id="game-over-screen" class="hidden">
+            <h1>TOUR ÉCROULÉE</h1>
+            <p>Score Final : <span id="final-score">0</span></p>
+            <button onclick="startGame()">REJOUER</button>
+        </div>
+        
+        <div class="footer">Appuyez sur Espace ou l'écran pour jouer</div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        // --- Configuration & Constantes ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d', { alpha: false }); // Optimisation
+        
+        let width, height;
+        let animationId;
+        
+        // Paramètres du jeu
+        const CONFIG = {
+            boxHeight: 18,        // Hauteur visuelle d'un bloc
+            boxSize: 50,          // Largeur/Profondeur initiale
+            initialSpeed: 2.5,    // Vitesse de départ
+            speedIncrement: 0.1,  // Accélération par bloc
+            cameraSpeed: 0.05,    // Fluidité caméra
+            colors: {
+                base: 200,        // Teinte de départ (HSL)
+                cycle: 0.2        // Changement de teinte par étage
+            }
+        };
+
+        // --- État du Jeu ---
+        let state = {
+            boxes: [],            // La tour
+            debris: [],           // Les morceaux coupés qui tombent
+            currentBox: null,     // Le bloc qui bouge
+            score: 0,
+            cameraY: 0,           // Position Y cible de la caméra
+            cameraYCurrent: 0,    // Position Y actuelle (lissée)
+            mode: 'START',        // START, PLAYING, GAMEOVER
+            direction: 1,         // 1 ou -1 (sens du mouvement)
+            axis: 'x',            // 'x' ou 'z' (axe du mouvement)
+            speed: 0
+        };
+
+        // --- Classes ---
+
+        class Box {
+            constructor(x, y, z, w, d, color) {
+                this.x = x;
+                this.y = y; // Hauteur dans la grille (entier)
+                this.z = z;
+                this.w = w; // Largeur (axe X)
+                this.d = d; // Profondeur (axe Z)
+                this.color = color;
+            }
+
+            draw() {
+                // Conversion Coordonnées 3D -> 2D Isométrique
+                // On centre le tout : (x - z) est l'axe horizontal écran
+                // (x + z) est l'axe vertical "profondeur" écran
+                // y est la hauteur verticale écran
+
+                const isoX = (this.x - this.z) * 20 + width / 2;
+                const isoY = (this.x + this.z) * 12 - (this.y * CONFIG.boxHeight) + height / 1.5 - state.cameraYCurrent;
+
+                // Dimensions projetées
+                // C'est une approximation artistique isométrique
+                const sizeX = this.w * 20;
+                const sizeY = this.d * 12; // Écrasé par la perspective
+                
+                // Dessin
+                ctx.lineWidth = 1;
+                ctx.lineJoin = 'round';
+
+                // Face du Haut
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.moveTo(isoX, isoY - sizeY);
+                ctx.lineTo(isoX + sizeX, isoY);
+                ctx.lineTo(isoX, isoY + sizeY);
+                ctx.lineTo(isoX - sizeX, isoY);
+                ctx.closePath();
+                ctx.fill();
+                // "Highlight" léger sur les arêtes pour la netteté
+                ctx.strokeStyle = "rgba(255,255,255,0.1)";
+                ctx.stroke();
+
+                // Face Droite (Ombrée un peu)
+                ctx.fillStyle = shadeColor(this.color, -10);
+                ctx.beginPath();
+                ctx.moveTo(isoX + sizeX, isoY);
+                ctx.lineTo(isoX + sizeX, isoY + CONFIG.boxHeight);
+                ctx.lineTo(isoX, isoY + sizeY + CONFIG.boxHeight);
+                ctx.lineTo(isoX, isoY + sizeY);
+                ctx.closePath();
+                ctx.fill();
+
+                // Face Gauche (Ombrée plus)
+                ctx.fillStyle = shadeColor(this.color, -20);
+                ctx.beginPath();
+                ctx.moveTo(isoX - sizeX, isoY);
+                ctx.lineTo(isoX - sizeX, isoY + CONFIG.boxHeight);
+                ctx.lineTo(isoX, isoY + sizeY + CONFIG.boxHeight);
+                ctx.lineTo(isoX, isoY + sizeY);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        class Debris extends Box {
+            constructor(x, y, z, w, d, color) {
+                super(x, y, z, w, d, color);
+                this.vy = 0; // Vitesse verticale (gravité)
+                this.ay = 0.5; // Gravité
+                this.alpha = 1; // Transparence
+            }
+
+            update() {
+                this.y -= this.vy * 0.1; // Chute (y est inversé dans notre système visuel mais ici on gère la "hauteur de grille")
+                // Pour simuler la chute visuelle correcte sans casser la grille, on triche un peu sur le rendu
+                // Ou plus simplement: on modifie le draw pour prendre en compte un offset de chute
+                this.vy += this.ay;
+                this.alpha -= 0.02;
+            }
+
+            draw() {
+                if (this.alpha <= 0) return;
+                
+                // Calcul ISO identique à Box, mais avec un offset de chute manuel
+                const fallOffset = this.vy * 5; // Facteur visuel de chute
+                
+                const isoX = (this.x - this.z) * 20 + width / 2;
+                const isoY = (this.x + this.z) * 12 - (this.y * CONFIG.boxHeight) + height / 1.5 - state.cameraYCurrent + fallOffset;
+                
+                const sizeX = this.w * 20;
+                const sizeY = this.d * 12;
+
+                ctx.globalAlpha = this.alpha;
+                
+                // Dessin simplifié pour les débris
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.moveTo(isoX, isoY - sizeY);
+                ctx.lineTo(isoX + sizeX, isoY);
+                ctx.lineTo(isoX, isoY + sizeY);
+                ctx.lineTo(isoX - sizeX, isoY);
+                ctx.fill();
+
+                // Côtés
+                ctx.fillStyle = shadeColor(this.color, -10);
+                ctx.beginPath();
+                ctx.moveTo(isoX + sizeX, isoY);
+                ctx.lineTo(isoX + sizeX, isoY + CONFIG.boxHeight);
+                ctx.lineTo(isoX, isoY + sizeY + CONFIG.boxHeight);
+                ctx.lineTo(isoX, isoY + sizeY);
+                ctx.fill();
+                
+                ctx.fillStyle = shadeColor(this.color, -20);
+                ctx.beginPath();
+                ctx.moveTo(isoX - sizeX, isoY);
+                ctx.lineTo(isoX - sizeX, isoY + CONFIG.boxHeight);
+                ctx.lineTo(isoX, isoY + sizeY + CONFIG.boxHeight);
+                ctx.lineTo(isoX, isoY + sizeY);
+                ctx.fill();
+
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        // --- Fonctions Utilitaires ---
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            // Si on redimensionne, on force un redessin
+            if (state.mode !== 'PLAYING') draw();
+        }
+
+        function generateColor(score) {
+            const hue = (CONFIG.colors.base + score * 5) % 360;
+            return `hsl(${hue}, 60%, 65%)`;
+        }
+
+        // Assombrit ou éclaircit une couleur hex ou hsl
+        function shadeColor(color, percent) {
+            // Approche simple: on dessine tout en HSL pour faciliter ça, 
+            // mais ici on va manipuler la string HSL direct
+            if (color.startsWith('hsl')) {
+                const parts = color.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+                if (parts) {
+                    let h = parts[1];
+                    let s = parts[2];
+                    let l = parseInt(parts[3]) + percent;
+                    return `hsl(${h}, ${s}%, ${l}%)`;
+                }
+            }
+            return color; 
+        }
+
+        // --- Logique du Jeu ---
+
+        function startGame() {
+            // Reset UI
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('visible');
+            document.getElementById('game-over-screen').classList.add('hidden');
+            document.getElementById('game-over-screen').classList.remove('visible');
+            document.getElementById('score-container').classList.remove('hidden');
+            document.getElementById('score-container').innerText = '0';
+
+            // Reset State
+            state.boxes = [];
+            state.debris = [];
+            state.score = 0;
+            state.speed = CONFIG.initialSpeed;
+            state.cameraY = 0;
+            state.cameraYCurrent = 0;
+            state.direction = 1;
+            state.axis = 'x';
+            state.mode = 'PLAYING';
+
+            // Base box
+            const baseBox = new Box(0, 0, 0, 10, 10, generateColor(0));
+            state.boxes.push(baseBox);
+
+            spawnNextBox();
+
+            if (!animationId) loop();
+        }
+
+        function spawnNextBox() {
+            const prevBox = state.boxes[state.boxes.length - 1];
+            state.axis = state.score % 2 === 0 ? 'x' : 'z'; // Alterne axe
+
+            // Position de départ (loin sur l'axe actuel)
+            let x = prevBox.x;
+            let z = prevBox.z;
+            const dist = 25; // Distance de spawn
+
+            if (state.axis === 'x') {
+                x = -dist; // Commence à gauche
+                state.direction = 1; 
+            } else {
+                z = -dist; // Commence au fond
+                state.direction = 1;
+            }
+
+            state.currentBox = new Box(
+                x, 
+                prevBox.y + 1, 
+                z, 
+                prevBox.w, 
+                prevBox.d, 
+                generateColor(state.score + 1)
+            );
+        }
+
+        function placeBlock() {
+            if (state.mode !== 'PLAYING' || !state.currentBox) return;
+
+            const curr = state.currentBox;
+            const prev = state.boxes[state.boxes.length - 1];
+
+            // Calcul du débordement
+            let delta = 0;
+            let overlap = 0;
+            let debris = null;
+
+            if (state.axis === 'x') {
+                delta = curr.x - prev.x;
+                if (Math.abs(delta) >= prev.w) {
+                    return gameOver(); // Raté complet
+                }
+
+                // Taille restante
+                const newWidth = prev.w - Math.abs(delta);
+                
+                // Créer le débris
+                const debrisWidth = Math.abs(delta);
+                const debrisX = delta > 0 ? curr.x + newWidth : curr.x - debrisWidth; // Position du débris
+                // Correction position bloc
+                curr.w = newWidth;
+                curr.x = prev.x + delta / 2; // On recentre un peu la logique visuelle ? Non, alignement sur prev
+                // En fait:
+                // Si delta > 0 (bloc trop à droite), on garde la partie gauche. x devient prev.x + delta/2 n'est pas bon.
+                // Logique simple :
+                if (delta > 0) {
+                    curr.x = prev.x + delta / 2; // Le centre se décale
+                    debris = new Debris(curr.x + curr.w/2 + debrisWidth/2, curr.y, curr.z, debrisWidth, curr.d, curr.color);
+                } else {
+                    curr.x = prev.x + delta / 2;
+                    debris = new Debris(curr.x - curr.w/2 - debrisWidth/2, curr.y, curr.z, debrisWidth, curr.d, curr.color);
+                }
+                
+                // Pour simplifier la logique de positionnement du bloc "restant" :
+                // La nouvelle position doit être exactement alignée avec le bord restant du bloc précédent.
+                // Si on arrive de gauche (delta negatif) ou droite (delta positif)...
+                // Mathématiquement pour le centre :
+                curr.x = prev.x + delta / 2;
+                
+            } else { // Axis Z
+                delta = curr.z - prev.z;
+                if (Math.abs(delta) >= prev.d) {
+                    return gameOver();
+                }
+
+                const newDepth = prev.d - Math.abs(delta);
+                const debrisDepth = Math.abs(delta);
+                
+                curr.d = newDepth;
+                curr.z = prev.z + delta / 2;
+
+                if (delta > 0) {
+                    debris = new Debris(curr.x, curr.y, curr.z + curr.d/2 + debrisDepth/2, curr.w, debrisDepth, curr.color);
+                } else {
+                    debris = new Debris(curr.x, curr.y, curr.z - curr.d/2 - debrisDepth/2, curr.w, debrisDepth, curr.color);
+                }
+            }
+
+            // Ajout
+            state.boxes.push(curr);
+            if (debris) state.debris.push(debris);
+
+            // Score et Suite
+            state.score++;
+            document.getElementById('score-container').innerText = state.score;
+            
+            // Accélération
+            state.speed += CONFIG.speedIncrement;
+            
+            // Caméra
+            state.cameraY += CONFIG.boxHeight * 20; // Unité arbitraire de scroll
+
+            spawnNextBox();
+        }
+
+        function gameOver() {
+            state.mode = 'GAMEOVER';
+            // Le bloc courant tombe
+            const curr = state.currentBox;
+            const debris = new Debris(curr.x, curr.y, curr.z, curr.w, curr.d, curr.color);
+            state.debris.push(debris);
+            state.currentBox = null;
+
+            document.getElementById('final-score').innerText = state.score;
+            document.getElementById('game-over-screen').classList.remove('hidden');
+            document.getElementById('game-over-screen').classList.add('visible');
+            document.getElementById('score-container').classList.add('hidden');
+        }
+
+        // --- Boucle Principale ---
+
+        function update() {
+            // Mouvement Caméra
+            // On vise : (hauteur de la tour) * boxHeight (en pixels 2D)
+            const targetY = state.score * CONFIG.boxHeight * 0.8; // On monte doucement
+            state.cameraYCurrent += (targetY - state.cameraYCurrent) * CONFIG.cameraSpeed;
+
+            // Mouvement Bloc
+            if (state.mode === 'PLAYING' && state.currentBox) {
+                const limit = 30;
+                const speed = state.speed * 0.15; // Ajustement échelle
+
+                if (state.axis === 'x') {
+                    state.currentBox.x += speed * state.direction;
+                    if (state.currentBox.x > limit || state.currentBox.x < -limit) {
+                        state.direction *= -1;
+                    }
+                } else {
+                    state.currentBox.z += speed * state.direction;
+                    if (state.currentBox.z > limit || state.currentBox.z < -limit) {
+                        state.direction *= -1;
+                    }
+                }
+            }
+
+            // Physique Débris
+            for (let i = state.debris.length - 1; i >= 0; i--) {
+                const d = state.debris[i];
+                d.update();
+                if (d.alpha <= 0) state.debris.splice(i, 1);
+            }
+        }
+
+        function draw() {
+            // Fond (Nettoyage)
+            // On peut aussi utiliser clearRect si le canvas a un background CSS, 
+            // mais fillRect permet de changer la couleur dynamiquement si on veut
+            ctx.clearRect(0, 0, width, height);
+
+            // On dessine les blocs
+            // Ordre de dessin : du bas vers le haut pour que l'overlap soit correct (painter's algorithm)
+            // Dans notre système iso:
+            // Les blocs avec (x+z) le plus petit sont "au fond" (derrière).
+            // Les blocs avec y le plus petit sont "en bas".
+            // Comme on construit une tour séquentielle, l'ordre du tableau boxes (0..N) est généralement le bon ordre de dessin
+            // sauf si on a des débris qui tombent devant.
+            
+            // Fusionner boxes et debris pour tri ?
+            // Les débris tombent, donc leur Y change.
+            // Pour simplifier : on dessine tout le stack statique, puis le bloc courant, puis les débris (souvent devant ou derrière selon pos)
+            
+            // Dessin Stack
+            state.boxes.forEach(box => box.draw());
+
+            // Dessin Débris
+            state.debris.forEach(d => d.draw());
+
+            // Dessin Bloc Courant
+            if (state.currentBox) state.currentBox.draw();
+        }
+
+        function loop() {
+            update();
+            draw();
+            animationId = requestAnimationFrame(loop);
+        }
+
+        // --- Entrées (Inputs) ---
+
+        window.addEventListener('resize', resize);
+        window.addEventListener('load', resize);
+
+        // Click / Touch
+        function handleInput(e) {
+            if (e.target.tagName === 'BUTTON') return; // Ignore clics sur boutons
+            e.preventDefault(); // Empêche le double-tap zoom
+            
+            if (state.mode === 'START') {
+                startGame();
+            } else if (state.mode === 'PLAYING') {
+                placeBlock();
+            } else if (state.mode === 'GAMEOVER') {
+                // Ignore, il faut cliquer sur le bouton
+            }
+        }
+
+        document.addEventListener('mousedown', handleInput);
+        document.addEventListener('touchstart', handleInput, { passive: false });
+        
+        // Clavier (Espace)
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                if (state.mode === 'PLAYING') placeBlock();
+                else if (state.mode === 'START') startGame();
+                else if (state.mode === 'GAMEOVER') startGame();
+            }
+        });
+
+        // Animation de fond (Background) pour effet 'Start'
+        // Juste un draw initial
+        resize();
+        const demoBox = new Box(0, 0, 0, 10, 10, generateColor(0));
+        demoBox.draw();
+
+    </script>
+</body>
+</html>

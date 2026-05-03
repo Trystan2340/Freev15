@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tron Light Cycles - Ultra Edition</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+        :root {
+            --bg-color: #050505;
+            --p1-color: #00f3ff;
+            --p2-color: #ff0055;
+            --bonus-color: #f7ff00;
+            --text-color: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Orbitron', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        #game-container {
+            position: relative;
+            box-shadow: 0 0 60px rgba(0, 243, 255, 0.15);
+            border: 2px solid #333;
+            background: #000;
+        }
+
+        canvas {
+            display: block;
+            image-rendering: pixelated;
+        }
+
+        /* Couches UI */
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 20;
+            transition: opacity 0.3s;
+        }
+
+        .overlay-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8rem;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 30px #fff;
+            z-index: 15;
+            pointer-events: none;
+        }
+
+        .hidden {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            background: linear-gradient(90deg, var(--p1-color), #fff, var(--p2-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
+        }
+
+        .credits {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 2px solid var(--p1-color);
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-family: 'Orbitron', sans-serif;
+            margin: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            width: 280px;
+        }
+
+        .btn:hover {
+            background: var(--p1-color);
+            color: #000;
+            box-shadow: 0 0 25px var(--p1-color);
+            transform: scale(1.05);
+        }
+
+        .btn.secondary { border-color: var(--p2-color); }
+        .btn.secondary:hover { background: var(--p2-color); box-shadow: 0 0 25px var(--p2-color); }
+
+        /* HUD */
+        #hud {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 30px;
+            box-sizing: border-box;
+            pointer-events: none;
+            z-index: 5;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+        }
+
+        .player-hud { display: flex; flex-direction: column; align-items: center; }
+        .score { font-size: 2.2rem; font-weight: bold; }
+        
+        .turbo-bar-container {
+            width: 120px;
+            height: 8px;
+            background: #222;
+            border: 1px solid #444;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .turbo-bar { height: 100%; width: 100%; transition: width 0.1s linear; }
+        .p1-hud .score { color: var(--p1-color); text-shadow: 0 0 15px var(--p1-color); }
+        .p1-hud .turbo-bar { background: var(--p1-color); box-shadow: 0 0 10px var(--p1-color); }
+        .p2-hud .score { color: var(--p2-color); text-shadow: 0 0 15px var(--p2-color); }
+        .p2-hud .turbo-bar { background: var(--p2-color); box-shadow: 0 0 10px var(--p2-color); }
+
+        #speed-display {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #555;
+            font-size: 0.8rem;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translate(0,0); }
+            25% { transform: translate(-4px, 4px); }
+            50% { transform: translate(4px, -4px); }
+            75% { transform: translate(-4px, -4px); }
+        }
+        .shake { animation: shake 0.4s; }
+    </style>
+</head>
+<body>
+    <!-- Bouton Retour Freev -->
+    <a href="../../reste%20github/freevindex.html" id="freev-back-btn" style="position:fixed;top:14px;left:14px;z-index:9999;display:flex;align-items:center;gap:7px;padding:7px 14px;background:rgba(15,23,42,0.85);border:1px solid rgba(255,255,255,0.15);border-radius:999px;color:#cbd5e1;font-family:sans-serif;font-size:12px;font-weight:600;text-decoration:none;backdrop-filter:blur(10px);transition:all 0.2s ease;" onmouseover="this.style.color='#fff';this.style.borderColor='rgba(34,211,238,0.6)';this.style.boxShadow='0 0 14px rgba(34,211,238,0.25)'" onmouseout="this.style.color='#cbd5e1';this.style.borderColor='rgba(255,255,255,0.15)';this.style.boxShadow='none'">&#8592; Retour</a>
+
+    <div id="game-container">
+        <canvas id="gameCanvas" width="900" height="600"></canvas>
+        
+        <div id="hud" class="hidden">
+            <div class="player-hud p1-hud">
+                <div class="score"><span id="score1">0</span></div>
+                <div class="turbo-bar-container"><div id="turbo1" class="turbo-bar"></div></div>
+            </div>
+            <div id="speed-display">VITESSE: <span id="speed-val">100</span>%</div>
+            <div class="player-hud p2-hud">
+                <div class="score"><span id="score2">0</span></div>
+                <div class="turbo-bar-container"><div id="turbo2" class="turbo-bar"></div></div>
+            </div>
+        </div>
+
+        <div id="countdown-text" class="overlay-text hidden">3</div>
+
+        <div id="pause-screen" class="ui-layer hidden">
+            <h2 style="font-size: 3rem; letter-spacing: 10px;">PAUSE</h2>
+            <button class="btn" onclick="togglePause()">Reprendre</button>
+            <button class="btn secondary" onclick="showMenu()">Quitter</button>
+        </div>
+
+        <div id="main-menu" class="ui-layer">
+            <h1>TRON <span style="font-size: 1.5rem; color: #fff;">ULTRA</span></h1>
+            <div class="credits">Créé par Freev</div>
+            
+            <button class="btn" onclick="startGame(false)">Mode Solo (IA)</button>
+            <button class="btn secondary" onclick="startGame(true)">Mode Duel (Local)</button>
+            
+            <div style="margin-top: 30px; font-size: 0.75rem; color: #666; text-align: center;">
+                <p>J1: [Z][Q][S][D] + [E] Turbo | J2: [Flèches] + [M] Turbo</p>
+                <p style="color: var(--bonus-color);">Récupérez les orbes jaunes pour recharger le Turbo !</p>
+            </div>
+        </div>
+
+        <div id="game-over" class="ui-layer hidden">
+            <h2 id="winner-text" style="font-size: 3rem;">-</h2>
+            <button class="btn" onclick="resetGame()">Revanche</button>
+            <button class="btn secondary" onclick="showMenu()">Menu</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const CELL_SIZE = 10;
+        const GAP = 1;
+        
+        const COLORS = {
+            bg: '#000000',
+            p1: '#00f3ff',
+            p2: '#ff0055',
+            bonus: '#f7ff00'
+        };
+
+        let gridWidth = canvas.width / CELL_SIZE;
+        let gridHeight = canvas.height / CELL_SIZE;
+        let grid = [];
+        let gameLoopId;
+        let isTwoPlayer = false;
+        let isGameOver = false;
+        let isPaused = false;
+        let isCountingDown = false;
+        let scores = { p1: 0, p2: 0 };
+        let particles = [];
+        let bonuses = [];
+        let gameTime = 0;
+        let currentSpeed = 55;
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x * CELL_SIZE;
+                this.y = y * CELL_SIZE;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 6 + 2;
+                this.dx = Math.cos(angle) * speed;
+                this.dy = Math.sin(angle) * speed;
+                this.life = 1.0;
+                this.decay = Math.random() * 0.02 + 0.015;
+                this.color = color;
+            }
+            update() {
+                this.x += this.dx; this.y += this.dy;
+                this.life -= this.decay;
+            }
+            draw(ctx) {
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fillRect(this.x, this.y, 4, 4);
+                ctx.globalAlpha = 1;
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        class Bike {
+            constructor(id, x, y, dx, dy, color) {
+                this.id = id; this.startX = x; this.startY = y;
+                this.color = color;
+                this.reset();
+            }
+            reset() {
+                this.x = this.startX; this.y = this.startY;
+                this.dx = (this.id === 1) ? 1 : -1; this.dy = 0;
+                this.nextDx = this.dx; this.nextDy = this.dy;
+                this.dead = false; this.turboFuel = 100; this.isTurbo = false;
+            }
+            changeDir(dx, dy) {
+                if (this.dx !== -dx || this.dy !== -dy) {
+                    this.nextDx = dx; this.nextDy = dy;
+                }
+            }
+            updateLogic() {
+                if (this.dead) return;
+                let steps = 1;
+                if (this.isTurbo && this.turboFuel > 0) {
+                    steps = 2;
+                    this.turboFuel -= 2.5;
+                } else {
+                    this.isTurbo = false;
+                    if (this.turboFuel < 100) this.turboFuel += 0.25;
+                }
+
+                for(let i=0; i<steps; i++) {
+                    this.dx = this.nextDx; this.dy = this.nextDy;
+                    this.x += this.dx; this.y += this.dy;
+
+                    if (this.x < 0 || this.x >= gridWidth || this.y < 0 || this.y >= gridHeight || (grid[this.x] && grid[this.x][this.y] > 0)) {
+                        this.die(); return;
+                    }
+
+                    bonuses.forEach((b, idx) => {
+                        if (b.x === this.x && b.y === this.y) {
+                            this.turboFuel = 100;
+                            bonuses.splice(idx, 1);
+                        }
+                    });
+
+                    if (grid[this.x]) {
+                        grid[this.x][this.y] = this.id;
+                    }
+                }
+            }
+            die() {
+                if (this.dead) return;
+                this.dead = true;
+                for (let i = 0; i < 40; i++) particles.push(new Particle(this.x, this.y, this.color));
+            }
+        }
+
+        const p1 = new Bike(1, 15, Math.floor(gridHeight/2), 1, 0, COLORS.p1);
+        const p2 = new Bike(2, gridWidth-15, Math.floor(gridHeight/2), -1, 0, COLORS.p2);
+
+        function initGrid() {
+            grid = Array.from({length: gridWidth}, () => new Int8Array(gridHeight).fill(0));
+        }
+
+        function spawnBonus() {
+            if (bonuses.length < 2 && Math.random() < 0.01) {
+                let bx = Math.floor(Math.random() * gridWidth);
+                let by = Math.floor(Math.random() * gridHeight);
+                if (grid[bx] && grid[bx][by] === 0) bonuses.push({x: bx, y: by, pulse: 0});
+            }
+        }
+
+        function startGame(twoPlayers) {
+            isTwoPlayer = twoPlayers;
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('hud').classList.remove('hidden');
+            scores = { p1: 0, p2: 0 };
+            resetGame();
+        }
+
+        function resetGame() {
+            stopGame();
+            initGrid();
+            p1.reset(); p2.reset();
+            particles = []; bonuses = []; gameTime = 0; currentSpeed = 55;
+            isGameOver = false; isPaused = false; isCountingDown = true;
+            
+            if (grid[p1.x]) grid[p1.x][p1.y] = 1;
+            if (grid[p2.x]) grid[p2.x][p2.y] = 2;
+            
+            document.getElementById('game-over').classList.add('hidden');
+            document.getElementById('game-container').classList.remove('shake');
+            runCountdown(3);
+        }
+
+        function runCountdown(count) {
+            const el = document.getElementById('countdown-text');
+            el.classList.remove('hidden');
+            if (count > 0) {
+                el.innerText = count;
+                setTimeout(() => runCountdown(count - 1), 800);
+            } else {
+                el.innerText = "ACTION!";
+                setTimeout(() => {
+                    el.classList.add('hidden');
+                    isCountingDown = false;
+                    startLoop();
+                }, 500);
+            }
+        }
+
+        function startLoop() {
+            if (gameLoopId) clearInterval(gameLoopId);
+            gameLoopId = setInterval(gameLoop, currentSpeed);
+        }
+
+        function stopGame() { clearInterval(gameLoopId); gameLoopId = null; }
+
+        function togglePause() {
+            if (isGameOver || isCountingDown) return;
+            isPaused = !isPaused;
+            document.getElementById('pause-screen').classList.toggle('hidden', !isPaused);
+            if (isPaused) stopGame(); else startLoop();
+        }
+
+        function showMenu() {
+            stopGame();
+            document.querySelectorAll('.ui-layer').forEach(l => l.classList.add('hidden'));
+            document.getElementById('main-menu').classList.remove('hidden');
+            document.getElementById('hud').classList.add('hidden');
+            initGrid();
+            draw();
+        }
+
+        function gameLoop() {
+            if (isPaused || isCountingDown || isGameOver) return;
+            
+            gameTime++;
+            if (gameTime % 200 === 0 && currentSpeed > 30) {
+                currentSpeed -= 2;
+                startLoop();
+            }
+
+            if (!isTwoPlayer) runAI();
+
+            p1.updateLogic();
+            p2.updateLogic();
+            spawnBonus();
+
+            for(let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                if(particles[i].life <= 0) particles.splice(i, 1);
+            }
+
+            if (p1.dead || p2.dead) {
+                endRound();
+                return;
+            }
+            draw();
+            updateHUD();
+        }
+
+        function runAI() {
+            const headX = p2.x + p2.dx;
+            const headY = p2.y + p2.dy;
+            if (headX < 0 || headX >= gridWidth || headY < 0 || headY >= gridHeight || (grid[headX] && grid[headX][headY] !== 0) || Math.random() < 0.05) {
+                const dirs = [{dx:0, dy:-1}, {dx:0, dy:1}, {dx:-1, dy:0}, {dx:1, dy:0}];
+                const valid = dirs.filter(d => {
+                    const nx = p2.x + d.dx, ny = p2.y + d.dy;
+                    return nx >= 0 && nx < gridWidth && ny >= 0 && ny < gridHeight && grid[nx] && grid[nx][ny] === 0;
+                });
+                if (valid.length > 0) {
+                    const best = valid[Math.floor(Math.random() * valid.length)];
+                    p2.changeDir(best.dx, best.dy);
+                }
+            }
+        }
+
+        function endRound() {
+            stopGame();
+            isGameOver = true;
+            document.getElementById('game-container').classList.add('shake');
+            let txt = "ÉGALITÉ";
+            if (!p1.dead) { txt = "BLEU GAGNE"; scores.p1++; }
+            if (!p2.dead) { txt = "ROUGE GAGNE"; scores.p2++; }
+            
+            document.getElementById('winner-text').innerText = txt;
+            document.getElementById('winner-text').style.color = p1.dead ? COLORS.p2 : COLORS.p1;
+            
+            setTimeout(() => {
+                document.getElementById('game-over').classList.remove('hidden');
+            }, 1000);
+            
+            const endAnim = setInterval(() => {
+                draw();
+                for(let i = particles.length - 1; i >= 0; i--) {
+                    particles[i].update();
+                    if(particles[i].life <= 0) particles.splice(i, 1);
+                }
+                if (particles.length === 0 || !isGameOver) clearInterval(endAnim);
+            }, 30);
+        }
+
+        function updateHUD() {
+            document.getElementById('score1').innerText = scores.p1;
+            document.getElementById('score2').innerText = scores.p2;
+            document.getElementById('turbo1').style.width = p1.turboFuel + "%";
+            document.getElementById('turbo2').style.width = p2.turboFuel + "%";
+            document.getElementById('speed-val').innerText = Math.round(100 * (55/currentSpeed));
+        }
+
+        function draw() {
+            ctx.fillStyle = COLORS.bg;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = '#111';
+            ctx.lineWidth = 0.5;
+            for(let i=0; i<canvas.width; i+=CELL_SIZE*2) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+            }
+
+            if (!grid || grid.length === 0) return;
+
+            for (let x = 0; x < gridWidth; x++) {
+                if (!grid[x]) continue;
+                for (let y = 0; y < gridHeight; y++) {
+                    const val = grid[x][y];
+                    if (val > 0) {
+                        ctx.fillStyle = (val === 1) ? COLORS.p1 : COLORS.p2;
+                        ctx.globalAlpha = 0.8;
+                        ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE - GAP, CELL_SIZE - GAP);
+                    }
+                }
+            }
+            ctx.globalAlpha = 1;
+
+            bonuses.forEach(b => {
+                b.pulse += 0.1;
+                const s = CELL_SIZE + Math.sin(b.pulse) * 3;
+                ctx.fillStyle = COLORS.bonus;
+                ctx.shadowBlur = 15; ctx.shadowColor = COLORS.bonus;
+                ctx.beginPath();
+                ctx.arc(b.x * CELL_SIZE + CELL_SIZE/2, b.y * CELL_SIZE + CELL_SIZE/2, s/2.5, 0, Math.PI*2);
+                ctx.fill();
+            });
+
+            [p1, p2].forEach(p => {
+                if (p.dead) return;
+                ctx.fillStyle = '#fff';
+                ctx.shadowBlur = 20; ctx.shadowColor = p.color;
+                ctx.fillRect(p.x * CELL_SIZE - 1, p.y * CELL_SIZE - 1, CELL_SIZE + 1, CELL_SIZE + 1);
+            });
+
+            particles.forEach(p => p.draw(ctx));
+            ctx.shadowBlur = 0;
+        }
+
+        window.addEventListener('keydown', e => {
+            const k = e.key.toLowerCase();
+            if (k === 'p' || k === ' ') {
+                e.preventDefault();
+                togglePause();
+            }
+            if (isPaused || isGameOver || isCountingDown) return;
+
+            if (k === 'z' || k === 'w') p1.changeDir(0, -1);
+            if (k === 's') p1.changeDir(0, 1);
+            if (k === 'q' || k === 'a') p1.changeDir(-1, 0);
+            if (k === 'd') p1.changeDir(1, 0);
+            if (k === 'e') p1.isTurbo = true;
+
+            if (isTwoPlayer) {
+                if (e.key === 'ArrowUp') p2.changeDir(0, -1);
+                if (e.key === 'ArrowDown') p2.changeDir(0, 1);
+                if (e.key === 'ArrowLeft') p2.changeDir(-1, 0);
+                if (e.key === 'ArrowRight') p2.changeDir(1, 0);
+                if (k === 'm') p2.isTurbo = true;
+            }
+        });
+
+        window.addEventListener('keyup', e => {
+            const k = e.key.toLowerCase();
+            if (k === 'e') p1.isTurbo = false;
+            if (k === 'm') p2.isTurbo = false;
+        });
+
+        initGrid();
+        draw();
+    </script>
+</body>
+</html>
