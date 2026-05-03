@@ -1,2 +1,0 @@
-# FreevBrain v5 — stdlib Python uniquement, aucune dépendance externe
-# Ce fichier est requis par Render même s'il est vide
