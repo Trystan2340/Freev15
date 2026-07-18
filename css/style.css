@@ -1,0 +1,948 @@
+        .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        /* Custom Styles & Utilities */
+        html {
+            scroll-padding-top: 112px;
+        }
+
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            overflow-x: hidden;
+            isolation: isolate;
+        }
+
+        section[id],
+        footer[id] {
+            scroll-margin-top: 112px;
+        }
+
+        @media (max-width: 767px) {
+            html {
+                scroll-padding-top: 18px;
+                scroll-padding-bottom: 96px;
+            }
+
+            section[id],
+            footer[id] {
+                scroll-margin-top: 18px;
+                scroll-margin-bottom: 96px;
+            }
+        }
+
+        #freev-site-aura {
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            pointer-events: none;
+            opacity: 1;
+            mix-blend-mode: normal;
+            overflow: hidden;
+            transition: opacity 0.35s ease;
+            contain: paint;
+        }
+
+        #freev-site-aura::before,
+        #freev-site-aura::after {
+            content: "";
+            position: absolute;
+            inset: -18%;
+            transform: translate3d(0, 0, 0);
+            will-change: transform, opacity;
+        }
+
+        #freev-site-aura::before {
+            opacity: 0.62;
+        }
+
+        #freev-site-aura::after {
+            opacity: 0.42;
+        }
+
+        body > header {
+            position: relative;
+        }
+
+        body > section,
+        body > footer {
+            position: relative;
+            z-index: auto;
+        }
+
+        body > section > :not(canvas),
+        body > footer > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        body[data-freev-banner="aurora"] #freev-site-aura {
+            background: transparent;
+        }
+
+        body[data-freev-banner="aurora"] #freev-site-aura::before {
+            background:
+                linear-gradient(115deg, transparent 0 22%, rgba(34,211,238,0.26) 36%, transparent 50%),
+                linear-gradient(65deg, transparent 0 34%, rgba(168,85,247,0.24) 50%, transparent 66%);
+            animation: auraSlide 18s ease-in-out infinite alternate;
+        }
+
+        body[data-freev-banner="aurora"] #freev-site-aura::after {
+            background:
+                repeating-linear-gradient(100deg, transparent 0 28px, rgba(255,255,255,0.12) 29px 30px, transparent 31px 74px);
+            animation: auraLines 26s linear infinite;
+        }
+
+        body[data-freev-banner="circuit"] #freev-site-aura {
+            background: transparent;
+        }
+
+        body[data-freev-banner="circuit"] #freev-site-aura::before {
+            background:
+                repeating-linear-gradient(90deg, rgba(34,211,238,0.16) 0 1px, transparent 1px 48px),
+                repeating-linear-gradient(0deg, rgba(16,185,129,0.12) 0 1px, transparent 1px 42px);
+            animation: auraGrid 18s linear infinite;
+        }
+
+        body[data-freev-banner="circuit"] #freev-site-aura::after {
+            background:
+                linear-gradient(90deg, transparent 0 32%, rgba(34,211,238,0.24) 50%, transparent 68%);
+            animation: auraScan 8s linear infinite;
+        }
+
+        body[data-freev-banner="cosmos"] #freev-site-aura {
+            background: transparent;
+        }
+
+        body[data-freev-banner="cosmos"] #freev-site-aura::before {
+            background:
+                radial-gradient(circle, rgba(255,255,255,0.82) 0 1px, transparent 1.6px),
+                radial-gradient(circle, rgba(34,211,238,0.62) 0 1px, transparent 1.7px);
+            background-size: 54px 54px, 89px 89px;
+            background-position: 0 0, 24px 18px;
+            animation: auraStars 28s linear infinite;
+        }
+
+        body[data-freev-banner="cosmos"] #freev-site-aura::after {
+            background:
+                linear-gradient(135deg, transparent, rgba(168,85,247,0.22), rgba(14,165,233,0.13), transparent 72%);
+            animation: auraSlide 24s ease-in-out infinite alternate;
+        }
+
+        body[data-freev-banner="pulse"] #freev-site-aura {
+            background: transparent;
+        }
+
+        body[data-freev-banner="pulse"] #freev-site-aura::before {
+            background:
+                repeating-linear-gradient(120deg, transparent 0 26px, rgba(244,114,182,0.22) 27px 28px, transparent 29px 72px),
+                repeating-linear-gradient(60deg, transparent 0 34px, rgba(34,211,238,0.17) 35px 36px, transparent 37px 82px);
+            animation: auraLines 12s ease-in-out infinite;
+        }
+
+        body[data-freev-banner="pulse"] #freev-site-aura::after {
+            background:
+                linear-gradient(90deg, rgba(244,114,182,0.16), rgba(34,211,238,0.12), rgba(168,85,247,0.15));
+            animation: auraPulse 7s ease-in-out infinite;
+        }
+
+        body[data-freev-banner="calm"] #freev-site-aura {
+            background: transparent;
+        }
+
+        body[data-freev-banner="calm"] #freev-site-aura::before {
+            background:
+                linear-gradient(135deg, rgba(34,211,238,0.12), transparent 54%),
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.055) 0 1px, transparent 1px 70px);
+            animation: auraSlide 32s ease-in-out infinite alternate;
+        }
+
+        body[data-freev-banner="calm"] #freev-site-aura::after {
+            background:
+                linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+            animation: auraScan 18s ease-in-out infinite;
+        }
+
+        body[data-freev-banner="prism"] #freev-site-aura {
+            background: transparent;
+        }
+
+        body[data-freev-banner="prism"] #freev-site-aura::before {
+            background:
+                conic-gradient(from 80deg, rgba(34,211,238,0.2), rgba(244,114,182,0.22), rgba(168,85,247,0.2), rgba(34,211,238,0.2));
+            animation: auraRotate 22s linear infinite;
+        }
+
+        body[data-freev-banner="prism"] #freev-site-aura::after {
+            background:
+                repeating-linear-gradient(135deg, transparent 0 42px, rgba(255,255,255,0.12) 43px 44px, transparent 45px 96px);
+            animation: auraLines 18s ease-in-out infinite;
+        }
+
+        body[data-freev-banner="rain"] #freev-site-aura {
+            background: transparent;
+        }
+
+        body[data-freev-banner="rain"] #freev-site-aura::before {
+            background:
+                repeating-linear-gradient(90deg, transparent 0 22px, rgba(34,211,238,0.16) 23px 24px, transparent 25px 52px);
+            animation: auraRain 10s linear infinite;
+        }
+
+        body[data-freev-banner="rain"] #freev-site-aura::after {
+            background:
+                linear-gradient(180deg, transparent 0 12%, rgba(16,185,129,0.16) 24%, transparent 40% 100%);
+            animation: auraRainScan 6s linear infinite;
+        }
+
+        body[data-freev-banner="vortex"] #freev-site-aura {
+            background: transparent;
+        }
+
+        body[data-freev-banner="vortex"] #freev-site-aura::before {
+            background:
+                conic-gradient(from 180deg, transparent, rgba(34,211,238,0.28), transparent, rgba(168,85,247,0.24), transparent);
+            animation: auraRotate 18s linear infinite;
+        }
+
+        body[data-freev-banner="vortex"] #freev-site-aura::after {
+            background:
+                radial-gradient(circle at center, transparent 0 18%, rgba(255,255,255,0.1) 19% 20%, transparent 21% 34%, rgba(34,211,238,0.12) 35% 36%, transparent 37% 100%);
+            animation: auraPulse 8s ease-in-out infinite;
+        }
+
+        body[data-freev-banner="horizon"] #freev-site-aura {
+            background: transparent;
+        }
+
+        body[data-freev-banner="horizon"] #freev-site-aura::before {
+            background:
+                linear-gradient(180deg, transparent 0 42%, rgba(34,211,238,0.18) 48%, rgba(244,114,182,0.14) 52%, transparent 62% 100%);
+            animation: auraHorizon 11s ease-in-out infinite;
+        }
+
+        body[data-freev-banner="horizon"] #freev-site-aura::after {
+            background:
+                repeating-linear-gradient(0deg, transparent 0 36px, rgba(255,255,255,0.08) 37px 38px, transparent 39px 84px);
+            animation: auraGrid 26s linear infinite;
+        }
+
+        body[data-freev-banner="comet"] #freev-site-aura {
+            background: transparent;
+        }
+
+        body[data-freev-banner="comet"] #freev-site-aura::before {
+            background:
+                linear-gradient(120deg, transparent 0 42%, rgba(255,255,255,0.2) 48%, rgba(34,211,238,0.18) 52%, transparent 60% 100%);
+            animation: auraComet 5.8s ease-in-out infinite;
+        }
+
+        body[data-freev-banner="comet"] #freev-site-aura::after {
+            background:
+                radial-gradient(circle, rgba(255,255,255,0.75) 0 1px, transparent 1.7px),
+                radial-gradient(circle, rgba(244,114,182,0.5) 0 1px, transparent 1.6px);
+            background-size: 72px 72px, 118px 118px;
+            animation: auraStars 30s linear infinite;
+        }
+
+        body[data-freev-banner="aurora"] .glass,
+        body[data-freev-banner="aurora"] .glass-card {
+            border-color: rgba(34,211,238,0.16);
+            box-shadow: 0 10px 32px -26px rgba(34,211,238,0.32);
+        }
+
+        body[data-freev-banner="circuit"] .glass,
+        body[data-freev-banner="circuit"] .glass-card {
+            border-color: rgba(16,185,129,0.18);
+            box-shadow: 0 10px 32px -26px rgba(16,185,129,0.3);
+        }
+
+        body[data-freev-banner="cosmos"] .glass,
+        body[data-freev-banner="cosmos"] .glass-card {
+            border-color: rgba(168,85,247,0.18);
+            box-shadow: 0 10px 32px -26px rgba(168,85,247,0.32);
+        }
+
+        body[data-freev-banner="pulse"] .glass,
+        body[data-freev-banner="pulse"] .glass-card {
+            border-color: rgba(244,114,182,0.18);
+            box-shadow: 0 10px 32px -26px rgba(244,114,182,0.32);
+        }
+
+        body[data-freev-banner="calm"] .glass,
+        body[data-freev-banner="calm"] .glass-card {
+            border-color: rgba(34,211,238,0.1);
+            box-shadow: 0 8px 28px -26px rgba(34,211,238,0.2);
+        }
+
+        body[data-freev-banner="prism"] .glass,
+        body[data-freev-banner="prism"] .glass-card {
+            border-color: rgba(244,114,182,0.2);
+            box-shadow: 0 10px 32px -26px rgba(168,85,247,0.34);
+        }
+
+        body[data-freev-banner="rain"] .glass,
+        body[data-freev-banner="rain"] .glass-card {
+            border-color: rgba(16,185,129,0.2);
+            box-shadow: 0 10px 32px -26px rgba(34,211,238,0.32);
+        }
+
+        body[data-freev-banner="vortex"] .glass,
+        body[data-freev-banner="vortex"] .glass-card {
+            border-color: rgba(99,102,241,0.22);
+            box-shadow: 0 10px 34px -26px rgba(99,102,241,0.36);
+        }
+
+        body[data-freev-banner="horizon"] .glass,
+        body[data-freev-banner="horizon"] .glass-card {
+            border-color: rgba(34,211,238,0.18);
+            box-shadow: 0 10px 32px -26px rgba(244,114,182,0.28);
+        }
+
+        body[data-freev-banner="comet"] .glass,
+        body[data-freev-banner="comet"] .glass-card {
+            border-color: rgba(255,255,255,0.16);
+            box-shadow: 0 10px 34px -26px rgba(34,211,238,0.38);
+        }
+
+        @keyframes auraSlide {
+            0% { transform: translate3d(-8%, -4%, 0) scale(1.04) rotate(-1deg); }
+            100% { transform: translate3d(8%, 4%, 0) scale(1.08) rotate(1deg); }
+        }
+
+        @keyframes auraLines {
+            0% { transform: translate3d(-7%, 0, 0) scale(1.04); opacity: 0.32; }
+            50% { opacity: 0.58; }
+            100% { transform: translate3d(7%, 0, 0) scale(1.04); opacity: 0.32; }
+        }
+
+        @keyframes auraGrid {
+            0% { transform: translate3d(0, 0, 0) scale(1.04); }
+            100% { transform: translate3d(48px, 42px, 0) scale(1.04); }
+        }
+
+        @keyframes auraScan {
+            0% { transform: translate3d(-70%, 0, 0) scale(1.05); opacity: 0; }
+            15% { opacity: 0.6; }
+            50% { opacity: 0.34; }
+            85% { opacity: 0.6; }
+            100% { transform: translate3d(70%, 0, 0) scale(1.05); opacity: 0; }
+        }
+
+        @keyframes auraStars {
+            0% { transform: translate3d(0, 0, 0) scale(1.04); }
+            100% { transform: translate3d(54px, 90px, 0) scale(1.04); }
+        }
+
+        @keyframes auraPulse {
+            0%, 100% { transform: scale(1.02); opacity: 0.28; }
+            50% { transform: scale(1.08); opacity: 0.62; }
+        }
+
+        @keyframes auraRotate {
+            0% { transform: rotate(0deg) scale(1.1); opacity: 0.28; }
+            50% { opacity: 0.52; }
+            100% { transform: rotate(360deg) scale(1.1); opacity: 0.28; }
+        }
+
+        @keyframes auraRain {
+            0% { transform: translate3d(0, -9%, 0) scale(1.04); opacity: 0.34; }
+            100% { transform: translate3d(0, 9%, 0) scale(1.04); opacity: 0.54; }
+        }
+
+        @keyframes auraRainScan {
+            0% { transform: translate3d(0, -70%, 0) scale(1.04); opacity: 0; }
+            25% { opacity: 0.5; }
+            70% { opacity: 0.28; }
+            100% { transform: translate3d(0, 70%, 0) scale(1.04); opacity: 0; }
+        }
+
+        @keyframes auraHorizon {
+            0%, 100% { transform: translate3d(0, -4%, 0) scale(1.04); opacity: 0.3; }
+            50% { transform: translate3d(0, 4%, 0) scale(1.06); opacity: 0.58; }
+        }
+
+        @keyframes auraComet {
+            0% { transform: translate3d(-82%, -24%, 0) scale(1.06); opacity: 0; }
+            18% { opacity: 0.72; }
+            55% { opacity: 0.34; }
+            100% { transform: translate3d(82%, 24%, 0) scale(1.06); opacity: 0; }
+        }
+
+        @keyframes surfaceBreathe {
+            0%, 100% { box-shadow: 0 4px 30px rgba(14,165,233,0.08); border-color: rgba(255,255,255,0.1); }
+            50% { box-shadow: 0 12px 38px rgba(34,211,238,0.18); border-color: rgba(34,211,238,0.24); }
+        }
+
+        @keyframes circuitBreathe {
+            0%, 100% { box-shadow: 0 4px 30px rgba(34,211,238,0.08); border-color: rgba(34,211,238,0.14); }
+            50% { box-shadow: 0 10px 36px rgba(16,185,129,0.16); border-color: rgba(16,185,129,0.28); }
+        }
+
+        @keyframes cosmosBreathe {
+            0%, 100% { box-shadow: 0 4px 30px rgba(168,85,247,0.08); border-color: rgba(255,255,255,0.1); }
+            50% { box-shadow: 0 12px 40px rgba(168,85,247,0.18); border-color: rgba(168,85,247,0.24); }
+        }
+
+        @keyframes pulseBreathe {
+            0%, 100% { box-shadow: 0 4px 30px rgba(244,114,182,0.08); border-color: rgba(255,255,255,0.1); }
+            50% { box-shadow: 0 12px 42px rgba(244,114,182,0.22); border-color: rgba(244,114,182,0.28); }
+        }
+
+        @keyframes calmSurface {
+            0%, 100% { box-shadow: 0 4px 30px rgba(34,211,238,0.05); }
+            50% { box-shadow: 0 8px 34px rgba(34,211,238,0.1); }
+        }
+
+        /* Scrollbar personnalisé */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #0ea5e9, #a855f7);
+            border-radius: 5px;
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .glass-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.8));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(34, 211, 238, 0.5);
+            box-shadow: 0 10px 30px -10px rgba(34, 211, 238, 0.3);
+        }
+
+        /* Text Gradients */
+        .text-gradient {
+            background: linear-gradient(to right, #22d3ee, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Canvas Background */
+        #hero-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            opacity: 0.72;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            transform: translateZ(0);
+            will-change: opacity;
+        }
+
+        #logiciels,
+        #jeux,
+        #ia,
+        #contact {
+            background-color: rgba(5, 8, 18, 0.76) !important;
+            backdrop-filter: blur(1px);
+        }
+
+        #logiciels {
+            background-image: linear-gradient(180deg, rgba(15, 23, 42, 0.82), rgba(9, 14, 28, 0.72)) !important;
+        }
+
+        #jeux {
+            background-image: linear-gradient(180deg, rgba(5, 8, 18, 0.72), rgba(12, 14, 30, 0.78)) !important;
+        }
+
+        #ia {
+            background-image: linear-gradient(180deg, rgba(15, 23, 42, 0.74), rgba(2, 6, 23, 0.9)) !important;
+        }
+
+        #contact {
+            background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.86), rgba(2, 6, 23, 0.92)) !important;
+        }
+
+        /* Reveal Animation Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Markdown Styles for AI */
+        .prose p { margin-bottom: 0.5em; }
+        .prose ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 0.5em; }
+        .prose ol { list-style-type: decimal; padding-left: 1.5em; margin-bottom: 0.5em; }
+        .prose code { background: rgba(255,255,255,0.1); padding: 0.2em 0.4em; border-radius: 4px; font-family: monospace; }
+        .prose pre { background: rgba(0,0,0,0.3); padding: 1em; border-radius: 8px; overflow-x: auto; margin-bottom: 0.5em; }
+        .prose strong { color: #22d3ee; }
+
+        .profile-panel {
+            --profile-accent: #22d3ee;
+            position: relative;
+            overflow: hidden;
+            background:
+                linear-gradient(145deg, rgba(15, 23, 42, 0.92), rgba(8, 13, 28, 0.96)),
+                repeating-linear-gradient(135deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 18px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 18px 50px -30px var(--profile-accent);
+        }
+
+        .profile-panel::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.18), transparent),
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 42px),
+                repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 36px);
+            opacity: 0.85;
+            pointer-events: none;
+        }
+
+        .profile-banner {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background:
+                linear-gradient(135deg, rgba(14, 165, 233, 0.34), rgba(168, 85, 247, 0.24) 52%, rgba(244, 63, 94, 0.16)),
+                linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.01));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 18px 40px -28px var(--profile-accent);
+            animation: profileBannerGlow 6s ease-in-out infinite;
+        }
+
+        @keyframes profileBannerGlow {
+            0%, 100% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 18px 40px -28px var(--profile-accent); }
+            50% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 22px 48px -24px var(--profile-accent); }
+        }
+
+        .profile-banner-fx {
+            position: absolute;
+            inset: -8%;
+            background-size: 200% 200%;
+            opacity: 0.9;
+            pointer-events: none;
+            animation: bannerDriftA 14s ease-in-out infinite alternate;
+            background: linear-gradient(115deg, transparent, rgba(34,211,238,0.5), transparent 55%), linear-gradient(65deg, transparent 20%, rgba(168,85,247,0.45), transparent 75%);
+        }
+
+        .profile-banner::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
+            mask-image: linear-gradient(120deg, rgba(0,0,0,0.82), transparent 72%);
+            pointer-events: none;
+        }
+
+        .profile-banner::after {
+            content: "";
+            position: absolute;
+            right: -60%;
+            top: -46%;
+            width: 58%;
+            height: 160%;
+            transform: rotate(18deg);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+            pointer-events: none;
+            animation: bannerSheen 7s ease-in-out infinite;
+        }
+
+        @keyframes bannerSheen {
+            0% { right: -70%; opacity: 0; }
+            15% { opacity: 1; }
+            55% { right: 105%; opacity: 0.9; }
+            56% { opacity: 0; }
+            100% { right: 105%; opacity: 0; }
+        }
+
+        .profile-chip {
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(2, 6, 23, 0.42);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+
+        .profile-avatar-card {
+            position: relative;
+            background:
+                linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)),
+                linear-gradient(90deg, rgba(34, 211, 238, 0.16), transparent);
+        }
+
+        .profile-avatar-ring {
+            padding: 3px;
+            border-radius: 999px;
+            background: conic-gradient(from 120deg, var(--profile-accent), #f472b6, #a855f7, var(--profile-accent));
+            box-shadow: 0 0 24px -8px var(--profile-accent);
+        }
+
+        .profile-summary-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background:
+                linear-gradient(135deg, rgba(34, 211, 238, 0.11), rgba(168, 85, 247, 0.09)),
+                rgba(15, 23, 42, 0.72);
+            padding: 12px;
+        }
+
+        .profile-summary-card::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #22d3ee, #a855f7, #f472b6);
+        }
+
+        .profile-theme-option {
+            position: relative;
+            overflow: hidden;
+            min-height: 74px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.11);
+            background: rgba(15, 23, 42, 0.72);
+            transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+        }
+
+        .profile-theme-option:hover,
+        .profile-theme-option[aria-pressed="true"] {
+            transform: translateY(-1px);
+            border-color: rgba(34, 211, 238, 0.48);
+            background: rgba(15, 23, 42, 0.92);
+        }
+
+        .profile-theme-option[aria-pressed="true"]::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            border: 1px solid rgba(255,255,255,0.18);
+            box-shadow: inset 0 0 0 1px rgba(34,211,238,0.12), 0 14px 24px -20px #22d3ee;
+            pointer-events: none;
+        }
+
+        .theme-preview {
+            position: relative;
+            display: block;
+            height: 28px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(2, 6, 23, 0.72);
+        }
+
+        .theme-preview::before {
+            content: "";
+            position: absolute;
+            inset: -30%;
+            background-size: 160% 160%;
+            animation: previewMove 6s ease-in-out infinite alternate;
+        }
+
+        .theme-preview-aurora::before {
+            background:
+                linear-gradient(115deg, transparent, rgba(34,211,238,0.9), transparent 58%),
+                linear-gradient(65deg, transparent 20%, rgba(168,85,247,0.82), transparent 72%);
+        }
+
+        .theme-preview-circuit::before {
+            background:
+                repeating-linear-gradient(90deg, rgba(34,211,238,0.7) 0 1px, transparent 1px 14px),
+                repeating-linear-gradient(0deg, rgba(16,185,129,0.55) 0 1px, transparent 1px 12px);
+            animation-name: previewCircuit;
+        }
+
+        .theme-preview-cosmos::before {
+            background:
+                radial-gradient(circle, rgba(255,255,255,0.95) 0 1px, transparent 1.5px),
+                radial-gradient(circle, rgba(168,85,247,0.9) 0 1px, transparent 1.5px),
+                linear-gradient(135deg, rgba(14,165,233,0.42), rgba(168,85,247,0.5));
+            background-size: 18px 18px, 31px 31px, 160% 160%;
+        }
+
+        .theme-preview-pulse::before {
+            background:
+                repeating-linear-gradient(120deg, transparent 0 13px, rgba(244,114,182,0.9) 14px 15px, transparent 16px 30px),
+                linear-gradient(90deg, rgba(244,114,182,0.5), rgba(34,211,238,0.45));
+            animation-name: previewPulse;
+        }
+
+        .theme-preview-calm::before {
+            background:
+                linear-gradient(135deg, rgba(34,211,238,0.45), transparent),
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 20px);
+            animation-duration: 10s;
+        }
+
+        .theme-preview-prism::before {
+            background: conic-gradient(from 90deg, rgba(34,211,238,0.9), rgba(244,114,182,0.8), rgba(168,85,247,0.85), rgba(34,211,238,0.9));
+            animation-name: previewRotate;
+        }
+
+        .theme-preview-rain::before {
+            background:
+                repeating-linear-gradient(90deg, transparent 0 8px, rgba(34,211,238,0.9) 9px 10px, transparent 11px 18px),
+                linear-gradient(180deg, transparent, rgba(16,185,129,0.7), transparent);
+            animation-name: previewRain;
+        }
+
+        .theme-preview-vortex::before {
+            background:
+                conic-gradient(from 180deg, transparent, rgba(34,211,238,0.95), transparent, rgba(168,85,247,0.88), transparent),
+                radial-gradient(circle, transparent 0 34%, rgba(255,255,255,0.18) 35% 36%, transparent 37%);
+            animation-name: previewRotate;
+        }
+
+        .theme-preview-horizon::before {
+            background:
+                linear-gradient(180deg, transparent 0 39%, rgba(34,211,238,0.9) 48%, rgba(244,114,182,0.65) 54%, transparent 66%),
+                repeating-linear-gradient(0deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 12px);
+            animation-name: previewHorizon;
+        }
+
+        .theme-preview-comet::before {
+            background:
+                linear-gradient(120deg, transparent 0 34%, rgba(255,255,255,0.95) 46%, rgba(34,211,238,0.8) 52%, transparent 64%),
+                radial-gradient(circle, rgba(255,255,255,0.75) 0 1px, transparent 1.5px);
+            background-size: 160% 160%, 18px 18px;
+            animation-name: previewComet;
+        }
+
+        @keyframes previewMove {
+            0% { transform: translateX(-10%); }
+            100% { transform: translateX(10%); }
+        }
+
+        @keyframes previewCircuit {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(16px, 12px); }
+        }
+
+        @keyframes previewPulse {
+            0%, 100% { opacity: 0.75; transform: translateX(-10%); }
+            50% { opacity: 1; transform: translateX(10%); }
+        }
+
+        @keyframes previewRotate {
+            0% { transform: rotate(0deg) scale(1.15); }
+            100% { transform: rotate(360deg) scale(1.15); }
+        }
+
+        @keyframes previewRain {
+            0% { transform: translateY(-18%); }
+            100% { transform: translateY(18%); }
+        }
+
+        @keyframes previewHorizon {
+            0%, 100% { transform: translateY(-10%); opacity: 0.78; }
+            50% { transform: translateY(10%); opacity: 1; }
+        }
+
+        @keyframes previewComet {
+            0% { transform: translateX(-36%); opacity: 0.35; }
+            35% { opacity: 1; }
+            100% { transform: translateX(36%); opacity: 0.45; }
+        }
+
+        body[data-freev-banner="aurora"] .profile-banner {
+            background:
+                linear-gradient(135deg, rgba(14, 165, 233, 0.42), rgba(168, 85, 247, 0.28) 52%, rgba(244, 63, 94, 0.18)),
+                linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.01));
+        }
+        body[data-freev-banner="aurora"] .profile-banner-fx {
+            background: linear-gradient(115deg, transparent, rgba(34,211,238,0.55), transparent 55%), linear-gradient(65deg, transparent 20%, rgba(168,85,247,0.5), transparent 75%);
+            animation-name: bannerDriftA;
+            animation-duration: 11s;
+        }
+
+        body[data-freev-banner="circuit"] .profile-banner {
+            background:
+                repeating-linear-gradient(90deg, rgba(34,211,238,0.18) 0 1px, transparent 1px 28px),
+                linear-gradient(135deg, rgba(16,185,129,0.22), rgba(14,165,233,0.28), rgba(15,23,42,0.82));
+        }
+        body[data-freev-banner="circuit"] .profile-banner-fx {
+            background:
+                repeating-linear-gradient(90deg, rgba(34,211,238,0.4) 0 2px, transparent 2px 46px),
+                repeating-linear-gradient(0deg, rgba(16,185,129,0.32) 0 2px, transparent 2px 40px);
+            background-size: 92px 80px;
+            animation-name: bannerCircuit;
+            animation-duration: 8s;
+            animation-timing-function: linear;
+        }
+
+        body[data-freev-banner="cosmos"] .profile-banner {
+            background:
+                radial-gradient(circle at 18% 24%, rgba(255,255,255,0.26) 0 1px, transparent 1.5px),
+                radial-gradient(circle at 72% 36%, rgba(34,211,238,0.35) 0 1px, transparent 1.5px),
+                linear-gradient(135deg, rgba(79,70,229,0.35), rgba(168,85,247,0.3), rgba(2,6,23,0.78));
+        }
+        body[data-freev-banner="cosmos"] .profile-banner-fx {
+            background:
+                radial-gradient(circle, rgba(255,255,255,0.85) 0 1.4px, transparent 2px),
+                radial-gradient(circle, rgba(168,85,247,0.8) 0 1.4px, transparent 2px),
+                linear-gradient(135deg, rgba(14,165,233,0.3), rgba(168,85,247,0.35));
+            background-size: 46px 46px, 74px 74px, 200% 200%;
+            animation-name: bannerDriftA;
+            animation-duration: 16s;
+        }
+
+        body[data-freev-banner="pulse"] .profile-banner {
+            background:
+                repeating-linear-gradient(120deg, transparent 0 24px, rgba(244,114,182,0.22) 25px 26px, transparent 27px 58px),
+                linear-gradient(135deg, rgba(244,63,94,0.28), rgba(34,211,238,0.24), rgba(168,85,247,0.2));
+        }
+        body[data-freev-banner="pulse"] .profile-banner-fx {
+            background:
+                repeating-linear-gradient(120deg, transparent 0 30px, rgba(244,114,182,0.5) 31px 33px, transparent 34px 68px),
+                linear-gradient(90deg, rgba(244,114,182,0.3), rgba(34,211,238,0.28));
+            animation-name: bannerPulseSweep;
+            animation-duration: 3.2s;
+        }
+
+        body[data-freev-banner="calm"] .profile-banner {
+            background:
+                linear-gradient(135deg, rgba(14,165,233,0.22), rgba(15,23,42,0.74)),
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 32px);
+        }
+        body[data-freev-banner="calm"] .profile-banner-fx {
+            background: linear-gradient(120deg, transparent, rgba(34,211,238,0.32), transparent 65%);
+            animation-name: bannerDriftA;
+            animation-duration: 20s;
+            opacity: 0.6;
+        }
+
+        body[data-freev-banner="prism"] .profile-banner {
+            background:
+                conic-gradient(from 90deg, rgba(34,211,238,0.32), rgba(244,114,182,0.28), rgba(168,85,247,0.3), rgba(34,211,238,0.32)),
+                linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.01));
+        }
+        body[data-freev-banner="prism"] .profile-banner-fx {
+            background: conic-gradient(from 90deg, rgba(34,211,238,0.55), rgba(244,114,182,0.5), rgba(168,85,247,0.55), rgba(34,211,238,0.55));
+            inset: -50%;
+            animation-name: bannerRotate;
+            animation-duration: 14s;
+            animation-timing-function: linear;
+        }
+
+        body[data-freev-banner="rain"] .profile-banner {
+            background:
+                repeating-linear-gradient(90deg, transparent 0 18px, rgba(34,211,238,0.18) 19px 20px, transparent 21px 42px),
+                linear-gradient(135deg, rgba(16,185,129,0.2), rgba(14,165,233,0.24), rgba(2,6,23,0.82));
+        }
+        body[data-freev-banner="rain"] .profile-banner-fx {
+            background:
+                repeating-linear-gradient(90deg, transparent 0 20px, rgba(34,211,238,0.5) 21px 23px, transparent 24px 44px),
+                linear-gradient(180deg, transparent, rgba(16,185,129,0.4), transparent);
+            background-size: 100% 240%;
+            animation-name: bannerRain;
+            animation-duration: 5s;
+            animation-timing-function: linear;
+        }
+
+        body[data-freev-banner="vortex"] .profile-banner {
+            background:
+                conic-gradient(from 180deg, rgba(34,211,238,0.2), rgba(168,85,247,0.28), rgba(79,70,229,0.24), rgba(34,211,238,0.2)),
+                radial-gradient(circle at center, transparent 0 24%, rgba(255,255,255,0.08) 25% 26%, transparent 27%);
+        }
+        body[data-freev-banner="vortex"] .profile-banner-fx {
+            background:
+                conic-gradient(from 180deg, transparent, rgba(34,211,238,0.6), transparent, rgba(168,85,247,0.55), transparent),
+                radial-gradient(circle, transparent 0 34%, rgba(255,255,255,0.16) 35% 36%, transparent 37%);
+            inset: -50%;
+            animation-name: bannerRotate;
+            animation-duration: 10s;
+            animation-timing-function: linear;
+        }
+
+        body[data-freev-banner="horizon"] .profile-banner {
+            background:
+                linear-gradient(180deg, rgba(15,23,42,0.78) 0 42%, rgba(34,211,238,0.28) 50%, rgba(244,114,182,0.16) 58%, rgba(15,23,42,0.78)),
+                repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 22px);
+        }
+        body[data-freev-banner="horizon"] .profile-banner-fx {
+            background: linear-gradient(180deg, transparent 0 38%, rgba(34,211,238,0.55) 48%, rgba(244,114,182,0.4) 55%, transparent 68%);
+            background-size: 100% 220%;
+            animation-name: bannerHorizonSweep;
+            animation-duration: 8s;
+        }
+
+        body[data-freev-banner="comet"] .profile-banner {
+            background:
+                linear-gradient(120deg, transparent 0 34%, rgba(255,255,255,0.18) 46%, rgba(34,211,238,0.24) 52%, transparent 64%),
+                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.28) 0 1px, transparent 1.7px),
+                linear-gradient(135deg, rgba(14,165,233,0.22), rgba(168,85,247,0.2), rgba(2,6,23,0.82));
+        }
+        body[data-freev-banner="comet"] .profile-banner-fx {
+            background:
+                linear-gradient(120deg, transparent 0 38%, rgba(255,255,255,0.9) 46%, rgba(34,211,238,0.7) 52%, transparent 64%),
+                radial-gradient(circle, rgba(255,255,255,0.7) 0 1.4px, transparent 2px);
+            background-size: 220% 220%, 40px 40px;
+            animation-name: bannerCometSweep;
+            animation-duration: 4.5s;
+        }
+
+        @keyframes bannerDriftA {
+            0% { background-position: 0% 40%; }
+            100% { background-position: 100% 60%; }
+        }
+        @keyframes bannerCircuit {
+            0% { background-position: 0 0; }
+            100% { background-position: 92px 80px; }
+        }
+        @keyframes bannerPulseSweep {
+            0%, 100% { opacity: 0.75; background-position: 0% 50%; }
+            50% { opacity: 1; background-position: 100% 50%; }
+        }
+        @keyframes bannerRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes bannerRain {
+            0% { background-position: 0 -30%; }
+            100% { background-position: 0 30%; }
+        }
+        @keyframes bannerHorizonSweep {
+            0%, 100% { background-position: 50% 20%; opacity: 0.8; }
+            50% { background-position: 50% 80%; opacity: 1; }
+        }
+        @keyframes bannerCometSweep {
+            0% { background-position: -50% 50%, 0 0; opacity: 0.4; }
+            40% { opacity: 1; }
+            100% { background-position: 150% 50%, 0 0; opacity: 0.5; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #freev-site-aura,
+            #freev-site-aura::before,
+            #freev-site-aura::after,
+            .glass,
+            .glass-card,
+            .profile-banner,
+            .profile-banner-fx,
+            .profile-banner::after,
+            .theme-preview::before {
+                animation: none !important;
+            }
+        }

@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Freev | Par Trystan2340</title>
+<!-- ═══ FAVICONS & PWA ═══ -->
+<link href="icons/favicon.ico" rel="icon" type="image/x-icon"/>
+<link href="icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="icons/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+<link href="manifest.json" rel="manifest"/>
+<meta content="#0ea5e9" name="theme-color"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="Freev" name="apple-mobile-web-app-title"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<!-- ══════════════════════ -->
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- FontAwesome -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&amp;family=Poppins:wght@300;400;600&amp;display=swap" rel="stylesheet"/>
+<!-- Marked.js for Markdown parsing -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<link rel="stylesheet" href="css/style.css"/>
+<script src="js/tailwind-config.js"></script>
+</head>
+<body class="font-sans antialiased selection:bg-brand-accent selection:text-brand-dark" data-freev-banner="aurora">
+<div aria-hidden="true" id="freev-site-aura"></div>
+<script src="js/theme-init.js"></script>
+<!-- Navbar "Pilule" Flottante -->
+<!-- Desktop: Top, Mobile: Bottom -->
+<header class="fixed left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 bottom-4 top-auto w-[calc(100%-1.5rem)] max-w-xl md:top-6 md:bottom-auto md:w-auto md:max-w-none glass rounded-full border border-white/10 shadow-2xl shadow-brand-primary/10" id="navbar">
+<div class="px-4 py-3 flex justify-between items-center gap-3 md:px-6 md:gap-8">
+<!-- Logo -->
+<div class="flex items-center gap-2">
+<i class="fa-solid fa-cube text-xl text-brand-accent animate-pulse"></i>
+<a class="text-lg sm:text-xl font-heading font-bold tracking-wider" href="#">FREEV<span class="text-brand-primary">.</span></a>
+</div>
+<!-- Desktop Menu -->
+<nav class="hidden md:flex gap-6 font-medium text-sm tracking-wide items-center whitespace-nowrap">
+<a class="hover:text-brand-accent transition-colors relative group" href="#home">
+                    ACCUEIL
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-accent transition-all group-hover:w-full"></span>
+</a>
+<a class="hover:text-brand-accent transition-colors relative group" href="#logiciels">
+                    LOGICIELS
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-accent transition-all group-hover:w-full"></span>
+</a>
+<a class="hover:text-brand-accent transition-colors relative group" href="#jeux">
+                    JEUX
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-accent transition-all group-hover:w-full"></span>
+</a>
+<a class="hover:text-brand-accent transition-colors relative group" href="#ia">
+                    OUTILS IA
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-accent transition-all group-hover:w-full"></span>
+</a>
+</nav>
+<!-- Actions Desktop -->
+<div class="hidden md:flex gap-3 items-center">
+<button class="text-xs font-bold text-gray-300 hover:text-white transition-colors flex items-center gap-2 border border-white/10 px-3 py-1.5 rounded-full hover:bg-white/5" data-freev-open-login="" id="open-login-modal" type="button">
+<i class="fa-solid fa-user-astronaut"></i> Connexion
+                </button>
+<a class="email-link w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-r from-brand-primary to-brand-secondary hover:opacity-90 transition-opacity shadow-lg shadow-brand-primary/20" href="#">
+<i class="fa-solid fa-envelope text-white text-xs"></i>
+</a>
+</div>
+<!-- Mobile Menu Button -->
+<button aria-expanded="false" aria-label="Ouvrir le menu" class="md:hidden text-xl focus:outline-none p-2" id="mobile-menu-btn" type="button">
+<i class="fa-solid fa-bars"></i>
+</button>
+</div>
+<!-- Mobile Menu Overlay (Bulle flottante au-dessus de la barre sur mobile) -->
+<div class="hidden md:hidden absolute bottom-full left-0 w-full mb-3 origin-bottom transition-all duration-300 transform translate-y-4 scale-95 opacity-0" id="mobile-menu">
+<div class="glass rounded-2xl p-3 mx-auto border border-white/10 bg-brand-dark/95 shadow-xl">
+<div class="grid grid-cols-2 gap-2 text-center text-sm font-semibold">
+<a class="mobile-link py-2.5 px-2 hover:bg-white/5 rounded-lg" href="#home">ACCUEIL</a>
+<a class="mobile-link py-2.5 px-2 hover:bg-white/5 rounded-lg" href="#logiciels">LOGICIELS</a>
+<a class="mobile-link py-2.5 px-2 hover:bg-white/5 rounded-lg" href="#jeux">JEUX</a>
+<a class="mobile-link py-2.5 px-2 hover:bg-white/5 rounded-lg" href="#ia">OUTILS IA</a>
+<hr class="col-span-2 border-white/10"/>
+<div class="col-span-2 flex justify-center gap-3 pt-1">
+<button class="h-10 w-10 rounded-full bg-white/5 text-brand-accent border border-white/10" data-freev-open-login="" id="open-login-modal-mobile" type="button"><i class="fa-solid fa-user-astronaut text-lg"></i></button>
+<a class="email-link h-10 w-10 rounded-full bg-white/5 text-brand-primary border border-white/10 flex items-center justify-center" href="#"><i class="fa-solid fa-envelope text-lg"></i></a>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Fenêtre Historique des conversations -->
+<div class="hidden fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm px-4 py-5" id="history-modal">
+<div class="min-h-full flex items-center justify-center">
+<div class="glass w-full max-w-2xl rounded-2xl p-5 sm:p-6 border border-white/15 max-h-[calc(100vh-2.5rem)] flex flex-col">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-xl font-heading font-bold flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-brand-accent"></i> Historique des conversations</h2>
+<button class="text-gray-400 hover:text-white" id="close-history-modal" type="button">
+<i class="fa-solid fa-xmark text-xl"></i>
+</button>
+</div>
+<p class="text-xs text-gray-500 mb-3" id="history-sync-status">Enregistré sur cet appareil.</p>
+<div class="flex-grow overflow-y-auto space-y-3 pr-1" id="history-list"></div>
+<div class="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
+<span class="text-xs text-gray-500" id="history-count"></span>
+<div class="flex items-center gap-2">
+<button class="px-4 py-2 rounded-full text-xs font-bold bg-brand-accent/10 text-brand-accent border border-brand-accent/20 hover:bg-brand-accent/20 transition-colors" onclick="exportChatHistory()">
+<i class="fa-solid fa-download mr-1"></i> Télécharger en JSON
+</button>
+<button class="px-4 py-2 rounded-full text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-colors" onclick="clearChatHistory()">
+<i class="fa-solid fa-trash mr-1"></i> Vider l'historique
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Fenêtre de connexion -->
+<div class="hidden fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm px-4 py-5" id="login-modal">
+<div class="min-h-full flex items-center justify-center">
+<div class="glass w-full max-w-md rounded-2xl p-5 sm:p-6 border border-white/15 max-h-[calc(100vh-2.5rem)] overflow-y-auto">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-xl font-heading font-bold">Connexion Freev</h2>
+<button class="text-gray-400 hover:text-white" id="close-login-modal" type="button">
+<i class="fa-solid fa-xmark"></i>
+</button>
+</div>
+<p class="text-sm text-gray-400 mb-4">Inscrivez-vous ou connectez-vous pour synchroniser vos données avec Firebase.</p>
+<form class="space-y-3" id="auth-form" novalidate="">
+<input autocomplete="email" class="w-full bg-slate-900/80 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:border-brand-primary" id="auth-email" placeholder="Email" required="" type="email"/>
+<input autocomplete="current-password" class="w-full bg-slate-900/80 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:border-brand-primary" id="auth-password" minlength="6" placeholder="Mot de passe" required="" type="password"/>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<button class="w-full py-2 bg-gradient-to-r from-brand-primary to-brand-secondary rounded-lg font-semibold" id="login-button" type="submit">Se connecter</button>
+<button class="w-full py-2 border border-brand-accent/50 text-brand-accent rounded-lg font-semibold hover:bg-brand-accent/10 transition-colors" id="register-button" type="button">S'inscrire</button>
+</div>
+<button class="w-full text-xs text-gray-400 hover:text-brand-accent transition-colors" id="reset-password-button" type="button">Mot de passe oublié ?</button>
+<p aria-live="polite" class="min-h-5 text-xs text-gray-400" id="auth-status" role="status"></p>
+<div class="hidden rounded-lg border border-white/10 bg-slate-900/70 p-3 text-xs text-gray-300" id="firebase-user-data"></div>
+<div class="profile-panel hidden rounded-xl border border-brand-accent/20 p-4 space-y-3" id="profile-section">
+<div class="profile-banner p-4">
+<div class="profile-banner-fx" aria-hidden="true"></div>
+<div class="relative z-10 flex items-start justify-between gap-3">
+<div class="min-w-0">
+<p class="text-[10px] uppercase tracking-[0.22em] text-cyan-100/80 font-bold">Freev ID</p>
+<h3 class="mt-1 text-xl font-heading font-extrabold text-white">Profil Freev</h3>
+<p class="mt-1 text-xs text-cyan-50/75">Surnom, avatar et sauvegardes cloud.</p>
+</div>
+<span class="profile-chip shrink-0 rounded-full px-3 py-1 text-[10px] font-bold text-cyan-100">
+<i class="fa-solid fa-cloud mr-1"></i> Cloud
+                                </span>
+</div>
+<div class="relative z-10 mt-4 grid grid-cols-3 gap-2 text-[10px] font-bold text-white/80">
+<span class="profile-chip rounded-lg px-2 py-1.5 text-center"><i class="fa-solid fa-id-badge mr-1 text-brand-accent"></i>ID</span>
+<span class="profile-chip rounded-lg px-2 py-1.5 text-center"><i class="fa-solid fa-shield-halved mr-1 text-emerald-300"></i>Profil</span>
+<span class="profile-chip rounded-lg px-2 py-1.5 text-center"><i class="fa-solid fa-floppy-disk mr-1 text-pink-300"></i>Saves</span>
+</div>
+</div>
+<div class="profile-avatar-card flex items-center gap-3 rounded-xl border border-white/10 p-3">
+<div class="profile-avatar-ring shrink-0">
+<div class="h-14 w-14 rounded-full bg-brand-accent text-brand-dark flex items-center justify-center font-heading font-extrabold text-xl border-2 border-slate-950" id="profile-avatar-preview">F</div>
+</div>
+<label class="flex-1 text-xs text-gray-400">
+                                Couleur avatar
+                                <input class="mt-1 h-10 w-full rounded-lg bg-slate-900/80 border border-white/10" id="profile-avatar-color" type="color" value="#22d3ee"/>
+</label>
+</div>
+<div class="rounded-xl border border-white/10 bg-slate-950/40 p-3">
+<div class="mb-3 flex items-center justify-between gap-3">
+<div>
+<h3 class="text-sm font-bold text-white">Bannière animée</h3>
+<p class="text-xs text-gray-500">Change l'ambiance de tout l'index.</p>
+</div>
+<span class="rounded-full border border-brand-accent/20 bg-brand-accent/10 px-2.5 py-1 text-[10px] font-bold text-brand-accent" id="profile-banner-theme-label">Aurore</span>
+</div>
+<div aria-label="Choisir une bannière animée" class="grid grid-cols-2 gap-2 sm:grid-cols-5" role="listbox">
+<button aria-pressed="true" class="profile-theme-option p-2 text-left" data-profile-banner="aurora" type="button">
+<span class="theme-preview theme-preview-aurora"></span>
+<span class="mt-2 block text-[11px] font-bold text-white">Aurore</span>
+</button>
+<button aria-pressed="false" class="profile-theme-option p-2 text-left" data-profile-banner="circuit" type="button">
+<span class="theme-preview theme-preview-circuit"></span>
+<span class="mt-2 block text-[11px] font-bold text-white">Circuit</span>
+</button>
+<button aria-pressed="false" class="profile-theme-option p-2 text-left" data-profile-banner="cosmos" type="button">
+<span class="theme-preview theme-preview-cosmos"></span>
+<span class="mt-2 block text-[11px] font-bold text-white">Cosmos</span>
+</button>
+<button aria-pressed="false" class="profile-theme-option p-2 text-left" data-profile-banner="pulse" type="button">
+<span class="theme-preview theme-preview-pulse"></span>
+<span class="mt-2 block text-[11px] font-bold text-white">Pulse</span>
+</button>
+<button aria-pressed="false" class="profile-theme-option p-2 text-left" data-profile-banner="calm" type="button">
+<span class="theme-preview theme-preview-calm"></span>
+<span class="mt-2 block text-[11px] font-bold text-white">Calme</span>
+</button>
+<button aria-pressed="false" class="profile-theme-option p-2 text-left" data-profile-banner="prism" type="button">
+<span class="theme-preview theme-preview-prism"></span>
+<span class="mt-2 block text-[11px] font-bold text-white">Prisme</span>
+</button>
+<button aria-pressed="false" class="profile-theme-option p-2 text-left" data-profile-banner="rain" type="button">
+<span class="theme-preview theme-preview-rain"></span>
+<span class="mt-2 block text-[11px] font-bold text-white">Data Rain</span>
+</button>
+<button aria-pressed="false" class="profile-theme-option p-2 text-left" data-profile-banner="vortex" type="button">
+<span class="theme-preview theme-preview-vortex"></span>
+<span class="mt-2 block text-[11px] font-bold text-white">Vortex</span>
+</button>
+<button aria-pressed="false" class="profile-theme-option p-2 text-left" data-profile-banner="horizon" type="button">
+<span class="theme-preview theme-preview-horizon"></span>
+<span class="mt-2 block text-[11px] font-bold text-white">Horizon</span>
+</button>
+<button aria-pressed="false" class="profile-theme-option p-2 text-left" data-profile-banner="comet" type="button">
+<span class="theme-preview theme-preview-comet"></span>
+<span class="mt-2 block text-[11px] font-bold text-white">Comète</span>
+</button>
+</div>
+</div>
+<input autocomplete="nickname" class="w-full bg-slate-900/80 border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-brand-accent" id="profile-nickname" maxlength="24" minlength="3" placeholder="Surnom public" type="text"/>
+<input class="w-full bg-slate-900/80 border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-brand-accent" id="profile-display-name" maxlength="40" placeholder="Nom affiché (optionnel)" type="text"/>
+<textarea class="w-full bg-slate-900/80 border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-brand-accent resize-none" id="profile-bio" maxlength="160" placeholder="Petite bio (optionnel)" rows="3"></textarea>
+<select class="w-full bg-slate-900/80 border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-brand-accent" id="profile-favorite-type">
+<option value="logiciels">Logiciels</option>
+<option value="jeux">Jeux</option>
+<option value="ia">IA</option>
+<option value="tout">Tout l'univers Freev</option>
+</select>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<button class="w-full py-2 bg-brand-accent text-brand-dark rounded-lg font-semibold hover:bg-cyan-300 transition-colors" id="save-profile-button" type="button">Sauvegarder le profil</button>
+<button class="w-full py-2 border border-white/10 text-gray-300 rounded-lg font-semibold hover:bg-white/5 transition-colors" id="logout-button" type="button">Déconnexion</button>
+</div>
+<div class="hidden rounded-xl border border-white/10 bg-slate-900/60 p-3 space-y-3" id="profile-saves-section">
+<div class="flex items-center justify-between gap-3">
+<div>
+<h3 class="text-sm font-bold text-white">Mes sauvegardes</h3>
+<p class="text-xs text-gray-500">Gérez vos apps et jeux sauvegardés.</p>
+</div>
+<button class="px-3 py-1.5 rounded-lg border border-white/10 text-xs font-bold text-brand-accent hover:bg-white/5" id="refresh-saves-button" type="button">Actualiser</button>
+</div>
+<div class="space-y-2 text-xs text-gray-400" id="profile-saves-list"></div>
+</div>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- Hero Section -->
+<section class="relative min-h-[100svh] flex items-center justify-center overflow-hidden pb-28 pt-16 md:pb-0 md:pt-0" id="home">
+<canvas id="hero-canvas"></canvas> <!-- Background Animation -->
+<div class="relative z-10 text-center px-4 max-w-4xl mx-auto">
+<!-- Correction des majuscules ici (suppression de la classe 'uppercase') -->
+<div class="inline-block mb-4 px-4 py-1 rounded-full border border-brand-accent/30 bg-brand-accent/10 text-brand-accent text-sm font-semibold tracking-widest reveal">
+                Designé par Trystan2340
+            </div>
+<h1 class="text-4xl sm:text-5xl md:text-7xl font-heading font-extrabold mb-5 sm:mb-6 leading-tight reveal" style="transition-delay: 100ms;">
+                L'Univers Digital <br/>
+<span class="text-gradient">Sans Limites</span>
+</h1>
+<p class="text-base sm:text-lg md:text-xl text-gray-300 mb-8 sm:mb-10 max-w-2xl mx-auto reveal" style="transition-delay: 200ms;">
+                Explorez un hub tout-en-un combinant logiciels exclusifs, jeux immersifs et puissance de l'IA.
+            </p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center reveal" style="transition-delay: 300ms;">
+<a class="group px-6 sm:px-8 py-3 bg-white text-brand-dark font-bold rounded-full hover:bg-gray-100 transition-all flex items-center justify-center gap-2" href="#logiciels">
+                    Voir les projets
+                    <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+</a>
+<a class="px-6 sm:px-8 py-3 border border-white/20 rounded-full hover:bg-white/10 transition-all backdrop-blur-sm" href="#ia">
+                    Tester l'IA
+                </a>
+</div>
+</div>
+<!-- Scroll Indicator -->
+<div class="absolute bottom-24 md:bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce opacity-70">
+<i class="fa-solid fa-chevron-down text-2xl"></i>
+</div>
+</section>
+<!-- Logiciels Section -->
+<section class="py-20 px-6 bg-brand-dark relative" id="logiciels">
+<div class="container mx-auto">
+<div class="text-center mb-16 reveal">
+<h2 class="text-3xl md:text-4xl font-heading font-bold mb-4">Mes <span class="text-brand-primary">Logiciels</span></h2>
+<div class="h-1 w-20 bg-brand-primary mx-auto rounded-full"></div>
+<p class="mt-4 text-gray-400">Découvrez mes créations terminées et les projets ambitieux à venir.</p>
+</div>
+<!-- Projets Terminés -->
+<h3 class="text-2xl font-heading font-bold mb-6 text-white border-l-4 border-green-500 pl-4 reveal">Disponibles maintenant</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+<!-- CodeMaster V2 -->
+<div class="glass-card p-8 rounded-2xl reveal group">
+<div class="absolute top-0 left-0 w-full h-1 bg-brand-primary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+<div class="w-14 h-14 bg-brand-primary/20 rounded-lg flex items-center justify-center mb-6 text-brand-primary text-2xl">
+<i class="fa-solid fa-code"></i>
+</div>
+<h3 class="text-xl font-bold mb-3">CodeMaster V2</h3>
+<p class="text-gray-400 mb-6 text-sm">Un IDE léger optimisé pour le développement web rapide. Coloration syntaxique intelligente, templates intégrés et latence nulle.</p>
+<a class="block w-full py-3 bg-brand-primary text-white font-bold rounded-lg text-center hover:bg-brand-primary/80 transition-all shadow-lg shadow-brand-primary/20" href="logiciels/codemaster.html" target="_blank">
+<i class="fa-solid fa-rocket mr-2"></i> Lancer le logiciel
+                    </a>
+</div>
+<!-- StreamStudio Pro -->
+<div class="glass-card p-8 rounded-2xl reveal group" style="transition-delay: 100ms;">
+<div class="absolute top-0 left-0 w-full h-1 bg-brand-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+<div class="w-14 h-14 bg-brand-accent/20 rounded-lg flex items-center justify-center mb-6 text-brand-accent text-2xl">
+<i class="fa-solid fa-video"></i>
+</div>
+<h3 class="text-xl font-bold mb-3">StreamStudio Pro</h3>
+<p class="text-gray-400 mb-6 text-sm">Outil de capture d'écran et de webcam ultra-performant. Filtres en temps réel, PiP et enregistrement local sans latence.</p>
+<a class="block w-full py-3 bg-brand-accent text-brand-dark font-bold rounded-lg text-center hover:bg-brand-accent/80 transition-all shadow-lg shadow-brand-accent/20" href="logiciels/streamstudiopro.html" target="_blank">
+<i class="fa-solid fa-play mr-2"></i> Lancer le logiciel
+                    </a>
+</div>
+<!-- Freev TaskFlow -->
+<div class="glass-card p-8 rounded-2xl reveal group" style="transition-delay: 200ms;">
+<div class="absolute top-0 left-0 w-full h-1 bg-yellow-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+<div class="w-14 h-14 bg-yellow-500/20 rounded-lg flex items-center justify-center mb-6 text-yellow-500 text-2xl">
+<i class="fa-solid fa-list-check"></i>
+</div>
+<h3 class="text-xl font-bold mb-3">Freev TaskFlow</h3>
+<p class="text-gray-400 mb-6 text-sm">Gestionnaire de tâches type Kanban. Organisez vos projets et sauvegardez votre progression localement dans votre navigateur.</p>
+<a class="block w-full py-3 bg-yellow-500 text-brand-dark font-bold rounded-lg text-center hover:bg-yellow-400 transition-all shadow-lg shadow-yellow-500/20" href="logiciels/freev-taskflow.html" target="_blank">
+<i class="fa-solid fa-rocket mr-2"></i> Lancer l'outil
+                    </a>
+</div>
+<!-- Freev Sketch -->
+<div class="glass-card p-8 rounded-2xl reveal group" style="transition-delay: 300ms;">
+<div class="absolute top-0 left-0 w-full h-1 bg-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+<div class="w-14 h-14 bg-purple-500/20 rounded-lg flex items-center justify-center mb-6 text-purple-400 text-2xl">
+<i class="fa-solid fa-pen-ruler"></i>
+</div>
+<h3 class="text-xl font-bold mb-3">Freev Sketch Pro</h3>
+<p class="text-gray-400 mb-6 text-sm">Tableau blanc numérique et modélisation 3D basique. Dessinez, concevez et exportez vos créations artistiques.</p>
+<a class="block w-full py-3 bg-purple-500 text-white font-bold rounded-lg text-center hover:bg-purple-400 transition-all shadow-lg shadow-purple-500/20" href="logiciels/freevsketchpro.html" target="_blank">
+<i class="fa-solid fa-rocket mr-2"></i> Lancer l'outil
+                    </a>
+</div>
+<!-- DataVault -->
+<div class="glass-card p-8 rounded-2xl reveal group" style="transition-delay: 400ms;">
+<div class="absolute top-0 left-0 w-full h-1 bg-green-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+<div class="w-14 h-14 bg-green-500/20 rounded-lg flex items-center justify-center mb-6 text-green-400 text-2xl">
+<i class="fa-solid fa-file-shield"></i>
+</div>
+<h3 class="text-xl font-bold mb-3">DataVault</h3>
+<p class="text-gray-400 mb-6 text-sm">Coffre-fort numérique personnel. Chiffrez vos notes et mots de passe localement (AES-GCM) sans aucun serveur.</p>
+<a class="block w-full py-3 bg-green-500 text-white font-bold rounded-lg text-center hover:bg-green-400 transition-all shadow-lg shadow-green-500/20" href="logiciels/coffre.html" target="_blank">
+<i class="fa-solid fa-rocket mr-2"></i> Lancer l'outil
+                    </a>
+</div>
+</div>
+<!-- Nouveautés -->
+<h3 class="text-2xl font-heading font-bold mb-6 text-white border-l-4 border-yellow-500 pl-4 reveal">Nouveautés</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Freev Convert (Dispo) -->
+<div class="glass-card p-8 rounded-2xl reveal opacity-90 border border-yellow-500/20">
+<div class="absolute top-0 left-0 w-full h-1 bg-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+<div class="w-14 h-14 bg-pink-500/20 rounded-lg flex items-center justify-center mb-6 text-pink-500 text-2xl">
+<i class="fa-solid fa-right-left"></i>
+</div>
+<h3 class="text-xl font-bold mb-3">Freev Convert</h3>
+<p class="text-gray-400 mb-6 text-sm">Un convertisseur universel ultra-rapide (Devises, Unités, Fichiers) fonctionnant entièrement hors ligne.</p>
+<a class="block w-full py-3 bg-pink-500 text-white font-bold rounded-lg text-center hover:bg-pink-400 transition-all shadow-lg shadow-pink-500/20" href="logiciels/freevconvert.html">
+<i class="fa-solid fa-rocket mr-2"></i> Lancer l'outil
+                    </a>
+</div>
+<!-- PixelForge (Dispo) -->
+<div class="glass-card p-8 rounded-2xl reveal opacity-90 border border-yellow-500/20" style="transition-delay: 100ms;">
+<div class="absolute top-0 left-0 w-full h-1 bg-indigo-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+<div class="w-14 h-14 bg-indigo-500/20 rounded-lg flex items-center justify-center mb-6 text-indigo-400 text-2xl">
+<i class="fa-solid fa-border-all"></i>
+</div>
+<h3 class="text-xl font-bold mb-3">PixelForge</h3>
+<p class="text-gray-400 mb-6 text-sm">Éditeur de Pixel Art intuitif pour créer des sprites de jeux ou des avatars, avec export PNG/GIF.</p>
+<a class="block w-full py-3 bg-indigo-500 text-white font-bold rounded-lg text-center hover:bg-indigo-400 transition-all shadow-lg shadow-indigo-500/20" href="logiciels/pixelforge.html">
+<i class="fa-solid fa-rocket mr-2"></i> Lancer l'outil
+                    </a>
+</div>
+<!-- ResumeMaster (Remplace FocusBreath) -->
+<div class="glass-card p-8 rounded-2xl reveal opacity-90 border border-yellow-500/20" style="transition-delay: 200ms;">
+<div class="absolute top-0 left-0 w-full h-1 bg-slate-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+<div class="w-14 h-14 bg-slate-700/50 rounded-lg flex items-center justify-center mb-6 text-amber-400 text-2xl">
+<i class="fa-solid fa-file-contract"></i>
+</div>
+<h3 class="text-xl font-bold mb-3">ResumeMaster</h3>
+<p class="text-gray-400 mb-6 text-sm">Créez des CV professionnels avec un builder drag &amp; drop intuitif. Export PDF haute qualité instantané.</p>
+<!-- Correction du lien : ajout de l'espace pour correspondre au nom de fichier -->
+<a class="block w-full py-3 bg-slate-700 text-white font-bold rounded-lg text-center hover:bg-slate-600 transition-all shadow-lg shadow-slate-700/20" href="logiciels/resumemaster.html">
+<i class="fa-solid fa-rocket mr-2"></i> Lancer l'outil
+                    </a>
+</div>
+</div>
+</div>
+</section>
+<!-- Jeux Section -->
+<section class="py-20 px-6 relative overflow-hidden" id="jeux">
+<!-- Decoration background -->
+<div class="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-brand-secondary/10 to-transparent pointer-events-none"></div>
+<div class="container mx-auto relative z-10">
+<div class="flex flex-col md:flex-row justify-between items-end mb-12 reveal">
+<div>
+<h2 class="text-3xl md:text-4xl font-heading font-bold mb-2">Freev <span class="text-brand-secondary">Arcade</span></h2>
+<p class="text-gray-400">Mes jeux développés pour vous.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 mb-12">
+<!-- Game 1: Pacman -->
+<div class="glass-card rounded-2xl overflow-hidden group relative reveal h-80 border-2 border-brand-secondary/30">
+<div class="absolute inset-0 bg-black flex items-center justify-center">
+<div class="text-center">
+<i class="fa-solid fa-ghost text-6xl text-yellow-400 mb-4 animate-bounce"></i>
+<h3 class="text-3xl font-bold font-heading text-white">PAC-MAN</h3>
+<p class="text-gray-400 mt-2">Le classique revisité</p>
+</div>
+</div>
+<div class="absolute inset-0 bg-brand-secondary/90 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<h3 class="text-3xl font-bold mb-4 text-white">Pac-Man Ultimate</h3>
+<a class="px-8 py-3 bg-white text-brand-secondary font-bold rounded-full hover:scale-105 transition-transform shadow-lg" href="jeux/pacman.html" target="_blank">
+<i class="fa-solid fa-play mr-2"></i> JOUER
+                        </a>
+</div>
+</div>
+<!-- Game 2: Tron -->
+<div class="glass-card rounded-2xl overflow-hidden group relative reveal h-80 border-2 border-brand-accent/30" style="transition-delay: 100ms;">
+<div class="absolute inset-0 bg-black flex items-center justify-center">
+<div class="text-center">
+<i class="fa-solid fa-motorcycle text-6xl text-brand-accent mb-4 animate-pulse"></i>
+<h3 class="text-3xl font-bold font-heading text-white">TRON</h3>
+<p class="text-gray-400 mt-2">Course de motos légères</p>
+</div>
+</div>
+<div class="absolute inset-0 bg-brand-accent/90 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<h3 class="text-3xl font-bold mb-4 text-brand-dark">Tron Legacy</h3>
+<a class="px-8 py-3 bg-white text-brand-accent font-bold rounded-full hover:scale-105 transition-transform shadow-lg" href="jeux/tron.html" target="_blank">
+<i class="fa-solid fa-play mr-2"></i> JOUER
+                        </a>
+</div>
+</div>
+<!-- Game 3: CyberPong 3D -->
+<div class="glass-card rounded-2xl overflow-hidden group relative reveal h-80 border-2 border-pink-500/30">
+<div class="absolute inset-0 bg-black flex items-center justify-center">
+<div class="text-center">
+<i class="fa-solid fa-table-tennis-paddle-ball text-6xl text-pink-500 mb-4 animate-spin-slow"></i>
+<h3 class="text-3xl font-bold font-heading text-white">CYBER PONG</h3>
+<p class="text-gray-400 mt-2">Duel 3D Néo-Retro</p>
+</div>
+</div>
+<div class="absolute inset-0 bg-pink-500/90 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<h3 class="text-3xl font-bold mb-4 text-white">CyberPong 3D</h3>
+<!-- LINK CORRECTION -->
+<a class="px-8 py-3 bg-white text-pink-500 font-bold rounded-full hover:scale-105 transition-transform shadow-lg" href="jeux/cyberpong.html" target="_blank">
+<i class="fa-solid fa-play mr-2"></i> JOUER
+                        </a>
+</div>
+</div>
+<!-- Game 4: AstroMiner -->
+<div class="glass-card rounded-2xl overflow-hidden group relative reveal h-80 border-2 border-blue-500/30">
+<div class="absolute inset-0 bg-black flex items-center justify-center">
+<div class="text-center">
+<i class="fa-solid fa-shuttle-space text-6xl text-blue-500 mb-4 animate-pulse"></i>
+<h3 class="text-3xl font-bold font-heading text-white">ASTRO MINER</h3>
+<p class="text-gray-400 mt-2">Survie &amp; Exploration</p>
+</div>
+</div>
+<div class="absolute inset-0 bg-blue-500/90 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<h3 class="text-3xl font-bold mb-4 text-white">AstroMiner v3</h3>
+<a class="px-8 py-3 bg-white text-blue-500 font-bold rounded-full hover:scale-105 transition-transform shadow-lg" href="jeux/astrominer.html" target="_blank">
+<i class="fa-solid fa-play mr-2"></i> JOUER
+                        </a>
+</div>
+</div>
+</div>
+<!-- Nouveaux Jeux (Dispo) -->
+<h3 class="text-2xl font-heading font-bold mb-6 text-white border-l-4 border-pink-500 pl-4 reveal">Nouveaux Jeux</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Neon Snake (Dispo) -->
+<div class="glass-card p-6 rounded-2xl reveal flex items-center gap-6 border border-green-400/20">
+<div class="w-20 h-20 bg-green-400/20 rounded-lg flex items-center justify-center flex-shrink-0">
+<i class="fa-solid fa-staff-snake text-3xl text-green-400"></i>
+</div>
+<div class="flex-grow">
+<div class="flex items-center gap-3 mb-2">
+<h3 class="text-xl font-bold">Neon Snake</h3>
+</div>
+<p class="text-gray-400 text-sm mb-3">Le jeu légendaire avec une esthétique néon moderne, des power-ups et un classement mondial.</p>
+<a class="inline-block px-4 py-1.5 bg-green-500 text-brand-dark text-xs font-bold rounded-full hover:bg-green-400 transition-colors" href="jeux/neonsnake.html">
+<i class="fa-solid fa-play mr-1"></i> JOUER
+                        </a>
+</div>
+</div>
+<!-- Tower Block (Dispo) -->
+<div class="glass-card p-6 rounded-2xl reveal flex items-center gap-6 border border-orange-500/20" style="transition-delay: 100ms;">
+<div class="w-20 h-20 bg-orange-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+<i class="fa-solid fa-cubes-stacked text-3xl text-orange-500"></i>
+</div>
+<div class="flex-grow">
+<div class="flex items-center gap-3 mb-2">
+<h3 class="text-xl font-bold">Tower Block</h3>
+</div>
+<p class="text-gray-400 text-sm mb-3">Jeu d'adresse et de physique. Empilez les blocs le plus haut possible sans faire tomber la tour.</p>
+<a class="inline-block px-4 py-1.5 bg-orange-500 text-brand-dark text-xs font-bold rounded-full hover:bg-orange-400 transition-colors" href="jeux/towerblock.html">
+<i class="fa-solid fa-play mr-1"></i> JOUER
+                        </a>
+</div>
+</div>
+<!-- BeatJump (Nouveau Jeu Ajouté) -->
+<div class="glass-card p-6 rounded-2xl reveal flex items-center gap-6 border border-purple-600/20" style="transition-delay: 200ms;">
+<div class="w-20 h-20 bg-purple-600/20 rounded-lg flex items-center justify-center flex-shrink-0">
+<i class="fa-solid fa-music text-3xl text-purple-500"></i>
+</div>
+<div class="flex-grow">
+<div class="flex items-center gap-3 mb-2">
+<h3 class="text-xl font-bold">BeatJump</h3>
+</div>
+<p class="text-gray-400 text-sm mb-3">Jeu de rythme généré par votre propre musique. Sautez sur les beats !</p>
+<a class="inline-block px-4 py-1.5 bg-purple-600 text-white text-xs font-bold rounded-full hover:bg-purple-500 transition-colors" href="jeux/beatjump.html">
+<i class="fa-solid fa-play mr-1"></i> JOUER
+                        </a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- IA Tools Section (UPDATED FOR GEMINI) -->
+<section class="py-20 px-6 bg-gradient-to-b from-brand-dark to-slate-900" id="ia">
+<div class="container mx-auto max-w-5xl">
+<div class="flex flex-col md:flex-row gap-12 items-center">
+<div class="w-full md:w-1/2 reveal">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-bold mb-4 border border-cyan-500/20" id="ai-mode-badge">
+<i class="fa-solid fa-cube"></i> Freev AI — Connexion en cours...
+                    </div>
+<h2 class="text-3xl md:text-5xl font-heading font-bold mb-6">Freev AI <span class="text-gradient">Vision</span></h2>
+<p class="text-gray-300 mb-8 leading-relaxed">
+                        Le nouveau module d'intelligence artificielle Freev. Utilisez directement <strong class="text-brand-accent">Freev AI natif</strong> sans rien configurer, ou connectez <strong class="text-fuchsia-400">n'importe quel autre fournisseur IA</strong> (ChatGPT, Gemini, Hermes 4, OpenRouter, NVIDIA, Ollama, Kimi, Qwen...), en ligne ou en local.
+                    </p>
+<!-- Mode Toggle -->
+<div class="-mx-6 px-6 sm:mx-0 sm:px-0 mb-5 overflow-x-auto no-scrollbar">
+<div class="flex gap-2 p-1 bg-slate-900 rounded-full border border-white/10 w-max sm:w-fit">
+<button class="px-4 sm:px-5 py-2.5 sm:py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap bg-gradient-to-r from-brand-accent to-brand-secondary text-brand-dark shadow" id="btn-mode-freev" onclick="setAiMode('freev')">
+<i class="fa-solid fa-cube mr-1"></i> Freev AI
+                            </button>
+<button class="px-4 sm:px-5 py-2.5 sm:py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap text-gray-400 hover:text-white" id="btn-mode-custom" onclick="setAiMode('custom')">
+<i class="fa-solid fa-plug mr-1"></i> Autre IA
+                            </button>
+</div>
+</div>
+<!-- Bouton dédié : explorateur de modèles locaux adaptés à l'appareil -->
+<button class="mb-5 w-full sm:w-auto px-5 py-3 rounded-full text-sm font-bold border border-fuchsia-400/40 text-fuchsia-300 hover:bg-fuchsia-500/10 transition-all flex items-center justify-center gap-2" id="btn-model-explorer" onclick="openModelExplorer()">
+<i class="fa-solid fa-layer-group"></i> Explorer les modèles téléchargeables pour mon appareil
+                    </button>
+<div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+<button class="hidden w-full sm:w-auto px-6 py-3 border border-white/20 rounded-full hover:bg-white/10 transition-all items-center justify-center gap-2" id="btn-api-settings" onclick="toggleApiSettings()">
+<i class="fa-solid fa-gear"></i> Configurer Clé API
+                        </button>
+<!-- LINK CORRECTION: Pointing to telechargementfreevia.html -->
+<a class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-bold rounded-full hover:opacity-90 transition-all shadow-lg shadow-brand-primary/20 flex items-center justify-center gap-2" href="telechargement/telechargementfreevia.html">
+<i class="fa-solid fa-download"></i> App Desktop
+                        </a>
+</div>
+<!-- API Settings Dropdown (Autre fournisseur - ChatGPT, Gemini, Hermes 4, OpenRouter, NVIDIA, Ollama, Kimi, Qwen, etc.) -->
+<div class="hidden mt-4 p-4 bg-slate-800 rounded-xl border border-white/10 animate-fade-in space-y-3" id="api-settings-custom">
+<div>
+<label class="block text-xs font-bold text-gray-400 uppercase mb-2">Fournisseur</label>
+<select class="w-full bg-black/30 border border-white/10 rounded px-3 py-3 text-sm text-white focus:outline-none focus:border-fuchsia-400" id="custom-provider-preset" onchange="applyCustomPreset()">
+<option value="custom">Personnalisé (URL manuelle)</option>
+<option value="openai">ChatGPT (OpenAI)</option>
+<option value="gemini">Gemini (Google)</option>
+<option value="hermes">Hermes 4 (Nous Research)</option>
+<option value="openrouter">OpenRouter (accès à tous les modèles)</option>
+<option value="nvidia">NVIDIA NIM</option>
+<option value="ollama">Ollama (local)</option>
+<option value="lmstudio">LM Studio (local)</option>
+<option value="moonshot">Kimi (Moonshot AI)</option>
+<option value="dashscope">Qwen (Alibaba DashScope)</option>
+<option value="zhipu">GLM (Zhipu AI)</option>
+<option value="baichuan">Baichuan AI</option>
+<option value="groq">Groq</option>
+<option value="deepseek">DeepSeek</option>
+<option value="mistral">Mistral AI</option>
+<option value="together">Together AI</option>
+<option value="fireworks">Fireworks AI</option>
+<option value="cerebras">Cerebras</option>
+<option value="xai">xAI (Grok)</option>
+<option value="perplexity">Perplexity</option>
+<option value="cohere">Cohere</option>
+<option value="novita">Novita AI</option>
+<option value="siliconflow">SiliconFlow</option>
+<option value="hyperbolic">Hyperbolic</option>
+<option value="anyscale">Anyscale</option>
+</select>
+</div>
+<div>
+<label class="block text-xs font-bold text-gray-400 uppercase mb-2">URL de base de l'API (compatible OpenAI, sans /chat/completions)</label>
+<input class="w-full bg-black/30 border border-white/10 rounded px-3 py-3 sm:py-2 text-base sm:text-sm text-white focus:outline-none focus:border-fuchsia-400" id="custom-base-url" inputmode="url" placeholder="ex: https://openrouter.ai/api/v1" type="text"/>
+</div>
+<!-- Bibliothèque de modèles locaux (Ollama / LM Studio) — visible seulement pour ces fournisseurs -->
+<div class="hidden" id="local-model-library">
+<label class="block text-xs font-bold text-gray-400 uppercase mb-2">Modèles téléchargeables en local (triés du plus léger au plus lourd)</label>
+<select class="w-full bg-black/30 border border-fuchsia-400/40 rounded px-3 py-3 text-sm text-white focus:outline-none focus:border-fuchsia-400" id="local-model-picker" onchange="applyLocalModel()">
+<option value="">— Choisir un modèle pour économiser de la place —</option>
+<option value="qwen2.5:0.5b">Qwen2.5 0.5B — ~0.4 Go (ultra léger)</option>
+<option value="llama3.2:1b">Llama 3.2 1B — ~1.3 Go</option>
+<option value="gemma2:2b">Gemma 2 2B — ~1.6 Go</option>
+<option value="qwen2.5:3b">Qwen2.5 3B — ~1.9 Go</option>
+<option value="llama3.2:3b">Llama 3.2 3B — ~2.0 Go</option>
+<option value="phi3:mini">Phi-3 Mini 3.8B — ~2.2 Go</option>
+<option value="hermes3:8b">Hermes 3 8B — ~4.7 Go</option>
+<option value="qwen2.5:7b">Qwen2.5 7B — ~4.7 Go</option>
+<option value="mistral:7b">Mistral 7B — ~4.1 Go</option>
+<option value="llama3.1:8b">Llama 3.1 8B — ~4.7 Go</option>
+<option value="gemma2:9b">Gemma 2 9B — ~5.4 Go</option>
+<option value="deepseek-r1:7b">DeepSeek-R1 7B — ~4.7 Go</option>
+<option value="qwen2.5:14b">Qwen2.5 14B — ~9 Go</option>
+<option value="mixtral:8x7b">Mixtral 8x7B — ~26 Go (gros)</option>
+<option value="llama3.1:70b">Llama 3.1 70B — ~40 Go (très gros)</option>
+</select>
+<p class="text-[10px] text-gray-500 mt-2">Choisis un petit modèle si tu manques de place disque. Une fois choisi, télécharge-le avec <code class="text-fuchsia-300">ollama pull <span id="local-model-cmd-hint">nom-du-modele</span></code> dans un terminal, puis clique sur "Enregistrer" ci-dessous.</p>
+</div>
+<div>
+<label class="block text-xs font-bold text-gray-400 uppercase mb-2">Nom du modèle</label>
+<input class="w-full bg-black/30 border border-white/10 rounded px-3 py-3 sm:py-2 text-base sm:text-sm text-white focus:outline-none focus:border-fuchsia-400" id="custom-model-name" placeholder="ex: qwen/qwen-2.5-72b, moonshotai/kimi-k2, llama3..." type="text"/>
+</div>
+<div>
+<label class="block text-xs font-bold text-gray-400 uppercase mb-2">Clé API (laisser vide pour Ollama / LM Studio en local)</label>
+<div class="flex flex-col sm:flex-row gap-2">
+<input class="flex-grow bg-black/30 border border-white/10 rounded px-3 py-3 sm:py-2 text-base sm:text-sm text-white focus:outline-none focus:border-fuchsia-400" id="custom-api-key" placeholder="Collez votre clé ici" type="password"/>
+<button class="px-4 py-3 sm:py-2 bg-fuchsia-500 rounded text-sm font-bold whitespace-nowrap" onclick="saveCustomConfig()">Enregistrer</button>
+</div>
+</div>
+<p class="text-[10px] text-gray-500">Compatible avec toute API respectant le format OpenAI <code>/v1/chat/completions</code> : ChatGPT, Gemini, Hermes 4, OpenRouter, NVIDIA API, Ollama, Kimi, Qwen, Groq, DeepSeek, Mistral, Together AI, et bien d'autres. Tout est stocké localement dans votre navigateur, de façon permanente sur cet appareil.</p>
+</div>
+</div>
+<!-- Interface IA Interactive -->
+<div class="w-full md:w-1/2 reveal" style="transition-delay: 200ms;">
+<div class="glass-card p-1 rounded-2xl shadow-2xl shadow-brand-accent/10 border border-brand-accent/20">
+<div class="bg-brand-dark rounded-xl p-6 relative">
+<!-- Header -->
+<div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-4">
+<span class="text-sm font-mono text-gray-400 flex items-center gap-2" id="chat-header-label">
+<i class="fa-solid fa-cube text-brand-accent"></i> Freev AI (natif)
+                                </span>
+<div class="flex items-center gap-3">
+<button class="text-gray-500 hover:text-brand-accent transition-colors" id="btn-open-history" onclick="openHistoryPanel()" title="Historique des conversations">
+<i class="fa-solid fa-clock-rotate-left"></i>
+</button>
+<div class="flex gap-2">
+<div class="w-3 h-3 rounded-full bg-red-500"></div>
+<div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+<div class="w-3 h-3 rounded-full bg-green-500"></div>
+</div>
+</div>
+</div>
+<!-- Output Area -->
+<div class="min-h-[300px] max-h-[400px] bg-slate-900/50 rounded-lg p-4 mb-4 text-sm text-gray-300 font-sans overflow-y-auto border border-gray-800 prose prose-invert max-w-none" id="ai-output">
+<div class="mb-4 p-3 bg-slate-800/50 rounded-lg border border-brand-accent/20">
+<p class="text-brand-accent font-bold mb-1"><i class="fa-solid fa-cube mr-2"></i>Freev AI — FreevBrain v5</p>
+<p class="text-gray-400 text-sm">IA en ligne · apprend de chaque conversation.</p>
+<p class="text-gray-500 text-xs mt-2">Connexion au serveur en cours... ou bascule sur <strong class="text-brand-primary">un autre modèle</strong> si indisponible.</p>
+</div>
+</div>
+<!-- Image Preview Area -->
+<div class="hidden mb-2 relative inline-block" id="image-preview-container">
+<img class="h-16 rounded border border-brand-accent/50 object-cover" id="image-preview" src=""/>
+<button class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600" onclick="removeImage()">
+<i class="fa-solid fa-xmark"></i>
+</button>
+</div>
+<!-- Input Area -->
+<div class="relative flex gap-2 items-end">
+<input accept="image/*" class="hidden" id="image-upload" onchange="handleImageUpload(event)" type="file"/>
+<button class="p-3 bg-slate-800 text-gray-400 rounded-lg hover:text-brand-accent transition-colors border border-white/5 h-[46px]" onclick="document.getElementById('image-upload').click()" title="Ajouter une image">
+<i class="fa-solid fa-paperclip"></i>
+</button>
+<div class="relative">
+<button class="p-3 bg-slate-800 text-gray-400 rounded-lg hover:text-fuchsia-400 transition-colors border border-white/5 h-[46px]" id="switch-model-btn" onclick="toggleModelSwitcher()" title="Changer de modèle IA">
+<i class="fa-solid fa-layer-group"></i>
+</button>
+<div class="hidden absolute bottom-full mb-2 left-0 w-72 max-h-72 overflow-y-auto bg-slate-900 border border-white/10 rounded-xl shadow-2xl z-20 p-2" id="model-switcher-dropdown">
+<div class="text-xs font-bold text-gray-400 px-2 py-1 mb-1 flex items-center gap-2">
+<i class="fa-solid fa-layer-group text-fuchsia-400"></i> Mes modèles enregistrés
+</div>
+<div id="model-switcher-list"></div>
+</div>
+</div>
+<div class="relative flex-grow">
+<input class="w-full bg-slate-800 text-white rounded-lg pl-4 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-brand-accent/50 text-sm transition-all border border-white/5" id="ai-input" placeholder="Posez une question ou décrivez l'image..." type="text"/>
+<button class="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-brand-primary hover:text-white transition-colors" id="ai-send-btn" onclick="sendMessage()" title="Envoyer">
+<i class="fa-solid fa-paper-plane" id="ai-send-btn-icon"></i>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Modal : Bibliothèque de modèles IA locaux -->
+<div class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" id="model-explorer-modal" onclick="if(event.target===this) closeModelExplorer()">
+<div class="w-full max-w-6xl max-h-[90vh] overflow-y-auto bg-slate-900 border border-white/10 rounded-2xl p-5 sm:p-6 animate-fade-in">
+<div class="flex items-start justify-between gap-4 mb-4">
+<div>
+<h3 class="text-xl sm:text-2xl font-heading font-bold text-white flex items-center gap-2">
+<i class="fa-solid fa-layer-group text-fuchsia-400"></i> Bibliothèque de modèles IA
+                    </h3>
+<p class="text-xs text-gray-400 mt-1">Catalogue Freev : recherche rapide, compatibilité indicative et installation guidée pour Ollama et LM Studio. Les commandes d’installation sont incluses dans le guide rapide.</p>
+</div>
+<button aria-label="Fermer la bibliothèque" class="p-2 text-gray-400 hover:text-white rounded-full hover:bg-white/10 transition-all" onclick="closeModelExplorer()">
+<i class="fa-solid fa-xmark text-lg"></i>
+</button>
+</div>
+<div class="mb-4 p-3 bg-slate-800/70 rounded-xl border border-white/10 text-xs text-gray-300" id="device-info-banner">Détection de ton appareil en cours...</div>
+<div class="mb-4 rounded-xl border border-fuchsia-400/20 bg-fuchsia-500/5 overflow-hidden">
+<button class="w-full flex items-center justify-between gap-3 p-3 text-left hover:bg-white/5 transition-colors" onclick="toggleInstallQuickGuide()" type="button" aria-expanded="false" aria-controls="install-quick-guide">
+<span class="text-xs font-bold text-fuchsia-100"><i class="fa-solid fa-download mr-2 text-fuchsia-400"></i>Installer un modèle : guide rapide</span>
+<i class="fa-solid fa-chevron-down text-xs text-fuchsia-300" id="install-quick-guide-icon"></i>
+</button>
+<div class="hidden px-3 pb-3 text-xs text-gray-300 grid grid-cols-1 md:grid-cols-2 gap-3" id="install-quick-guide">
+  <div class="rounded-lg border border-cyan-400/20 bg-black/20 p-3 space-y-3">
+    <div>
+      <p class="font-bold text-white mb-1"><i class="fa-solid fa-download mr-1 text-cyan-300"></i>1. Installer Ollama</p>
+      <p class="text-gray-400">Installe Ollama une seule fois. Ensuite, toutes les commandes <code>ollama pull</code> des fiches fonctionneront.</p>
+    </div>
+    <div class="rounded-md border border-white/10 bg-slate-950/70 p-2">
+      <p class="text-[10px] font-bold text-cyan-200 mb-1">Windows — PowerShell</p>
+      <div class="flex gap-2 items-start"><code class="flex-1 text-cyan-300 break-all">irm https://ollama.com/install.ps1 | iex</code><button type="button" data-freev-copy-command="irm https://ollama.com/install.ps1 | iex" class="shrink-0 text-[10px] px-2 py-1 rounded border border-cyan-400/20 text-cyan-200 hover:bg-cyan-400/10"><i class="fa-regular fa-copy"></i></button></div>
+    </div>
+    <div class="rounded-md border border-white/10 bg-slate-950/70 p-2">
+      <p class="text-[10px] font-bold text-cyan-200 mb-1">macOS / Linux — Terminal</p>
+      <div class="flex gap-2 items-start"><code class="flex-1 text-cyan-300 break-all">curl -fsSL https://ollama.com/install.sh | sh</code><button type="button" data-freev-copy-command="curl -fsSL https://ollama.com/install.sh | sh" class="shrink-0 text-[10px] px-2 py-1 rounded border border-cyan-400/20 text-cyan-200 hover:bg-cyan-400/10"><i class="fa-regular fa-copy"></i></button></div>
+    </div>
+    <div class="border-t border-white/10 pt-2"><p class="text-[10px] text-gray-400">Télécharger un modèle ensuite :</p><code class="mt-1 block px-2 py-1 rounded bg-slate-950 text-cyan-300 overflow-x-auto">ollama pull qwen3:8b</code><p class="mt-1 text-[10px] text-gray-500">Pour discuter : <code>ollama run qwen3:8b</code>.</p></div>
+  </div>
+  <div class="rounded-lg border border-amber-400/20 bg-black/20 p-3 space-y-3">
+    <div>
+      <p class="font-bold text-white mb-1"><i class="fa-solid fa-download mr-1 text-amber-300"></i>2. Installer LM Studio CLI</p>
+      <p class="text-gray-400">L’application LM Studio inclut la commande <code>lms</code>. Pour une installation terminal sans interface, installe <strong>llmster</strong>, qui fournit aussi <code>lms</code>.</p>
+    </div>
+    <div class="rounded-md border border-white/10 bg-slate-950/70 p-2">
+      <p class="text-[10px] font-bold text-amber-200 mb-1">Windows — PowerShell</p>
+      <div class="flex gap-2 items-start"><code class="flex-1 text-amber-200 break-all">irm https://lmstudio.ai/install.ps1 | iex</code><button type="button" data-freev-copy-command="irm https://lmstudio.ai/install.ps1 | iex" class="shrink-0 text-[10px] px-2 py-1 rounded border border-amber-400/20 text-amber-100 hover:bg-amber-400/10"><i class="fa-regular fa-copy"></i></button></div>
+    </div>
+    <div class="rounded-md border border-white/10 bg-slate-950/70 p-2">
+      <p class="text-[10px] font-bold text-amber-200 mb-1">macOS / Linux — Terminal</p>
+      <div class="flex gap-2 items-start"><code class="flex-1 text-amber-200 break-all">curl -fsSL https://lmstudio.ai/install.sh | bash</code><button type="button" data-freev-copy-command="curl -fsSL https://lmstudio.ai/install.sh | bash" class="shrink-0 text-[10px] px-2 py-1 rounded border border-amber-400/20 text-amber-100 hover:bg-amber-400/10"><i class="fa-regular fa-copy"></i></button></div>
+    </div>
+    <div class="border-t border-white/10 pt-2"><p class="text-[10px] text-gray-400">Vérifier puis télécharger un modèle :</p><code class="mt-1 block px-2 py-1 rounded bg-slate-950 text-amber-200 overflow-x-auto">lms --help</code><code class="mt-1 block px-2 py-1 rounded bg-slate-950 text-amber-200 overflow-x-auto">lms get "Qwen3 8B"</code></div>
+  </div>
+</div>
+<div class="mt-3 rounded-lg border border-emerald-400/20 bg-emerald-500/5 p-3 text-xs text-emerald-50 md:col-span-2">
+  <div class="flex flex-wrap items-center justify-between gap-2">
+    <span><i class="fa-solid fa-link mr-1 text-emerald-300"></i><strong>Après téléchargement :</strong> ouvre <em>Mes modèles installés</em>, sélectionne ton modèle, puis Freev le configure automatiquement.</span>
+    <button type="button" onclick="openInstalledModels()" class="rounded-lg border border-emerald-400/30 px-2.5 py-1.5 font-bold text-emerald-100 hover:bg-emerald-500/15">Voir mes modèles</button>
+  </div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-3 mb-3 items-center">
+<div class="flex items-center gap-2 text-xs flex-wrap">
+<span class="text-gray-400 font-bold uppercase">Runtime :</span>
+<button class="px-3 py-1.5 rounded-full font-bold bg-fuchsia-500 text-white" id="explorer-runtime-ollama" onclick="setExplorerRuntime('ollama')">Ollama</button>
+<button class="px-3 py-1.5 rounded-full font-bold bg-slate-800 text-gray-400 hover:text-white border border-white/10" id="explorer-runtime-lmstudio" onclick="setExplorerRuntime('lmstudio')">LM Studio</button>
+</div>
+<div class="flex flex-wrap items-center justify-end gap-2">
+<button type="button" id="freev-open-local-models" onclick="openInstalledModels()" class="inline-flex items-center gap-2 rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-xs font-bold text-emerald-100 hover:bg-emerald-500/20 transition-colors">
+<i class="fa-solid fa-hard-drive"></i> Mes modèles installés
+</button>
+</div>
+<div class="relative">
+<i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-500 text-xs"></i>
+<input autocomplete="off" class="w-full bg-slate-800 border border-white/10 rounded-xl pl-9 pr-10 py-2.5 text-sm text-white outline-none focus:border-fuchsia-400/70" id="model-library-search" oninput="handleModelSearch()" onkeydown="handleModelSearchKey(event)" placeholder="Recherche intelligente : qwen code 7B · famille:qwen · ram&lt;=8 · quant:q4" type="search"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 rounded-lg text-gray-500 hover:text-white hover:bg-white/10" onclick="clearModelSearchOnly()" title="Effacer la recherche"><i class="fa-solid fa-xmark"></i></button>
+<div class="hidden absolute z-20 mt-2 left-0 right-0 max-h-64 overflow-y-auto rounded-xl border border-white/10 bg-slate-900 shadow-2xl p-1" id="model-search-suggestions"></div>
+</div>
+</div>
+<div class="mb-3 flex flex-wrap items-center gap-2 text-[11px]">
+<span class="text-gray-500 font-bold uppercase tracking-wide">Essais rapides :</span>
+<button class="px-2.5 py-1 rounded-full border border-fuchsia-400/20 text-fuchsia-200 bg-fuchsia-500/5 hover:bg-fuchsia-500/15" onclick="applyModelSearch('famille:qwen')">Qwen</button>
+<button class="px-2.5 py-1 rounded-full border border-cyan-400/20 text-cyan-200 bg-cyan-500/5 hover:bg-cyan-500/15" onclick="applyModelSearch('type:code')">Code</button>
+<button class="px-2.5 py-1 rounded-full border border-indigo-400/20 text-indigo-200 bg-indigo-500/5 hover:bg-indigo-500/15" onclick="applyModelSearch('type:vision')">Vision</button>
+<button class="px-2.5 py-1 rounded-full border border-emerald-400/20 text-emerald-200 bg-emerald-500/5 hover:bg-emerald-500/15" onclick="applyModelSearch('ram&lt;=8')">≤ 8 Go RAM</button>
+<button class="px-2.5 py-1 rounded-full border border-amber-400/20 text-amber-200 bg-amber-500/5 hover:bg-amber-500/15" onclick="applyModelSearch('quant:q4')">Q4</button>
+<span class="text-gray-600">Utilise Entrée pour choisir une suggestion.</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-2 mb-4">
+<select class="bg-slate-800 border border-white/10 rounded-xl px-3 py-2 text-xs text-white" id="model-library-family" onchange="renderModelGrid()"><option value="all">Toutes les familles</option></select>
+<select class="bg-slate-800 border border-white/10 rounded-xl px-3 py-2 text-xs text-white" id="model-library-type" onchange="renderModelGrid()">
+<option value="all">Tous les usages</option><option value="general">Généraliste</option><option value="reasoning">Raisonnement</option><option value="code">Code</option><option value="vision">Vision / images</option><option value="embedding">Embeddings / RAG</option><option value="translate">Traduction</option><option value="audio">Audio</option>
+</select>
+<select class="bg-slate-800 border border-white/10 rounded-xl px-3 py-2 text-xs text-white" id="model-library-quant" onchange="renderModelGrid()"><option value="all">Tous les formats</option><option value="official">Version officielle</option><option value="GGUF">GGUF</option><option value="EXL2">EXL2</option><option value="AWQ">AWQ</option><option value="GPTQ">GPTQ</option><option value="MLX">MLX</option><option value="BF16">BF16</option><option value="FP16">FP16</option></select>
+<select class="bg-slate-800 border border-white/10 rounded-xl px-3 py-2 text-xs text-white" id="model-library-size" onchange="renderModelGrid()">
+<option value="all">Toutes les tailles</option><option value="tiny">Ultra léger (≤ 4 Go RAM)</option><option value="small">Léger (≤ 8 Go RAM)</option><option value="medium">Moyen (≤ 16 Go RAM)</option><option value="large">Puissant (&gt; 16 Go RAM)</option>
+</select>
+<select class="bg-slate-800 border border-white/10 rounded-xl px-3 py-2 text-xs text-white" id="model-library-sort" onchange="renderModelGrid()"><option value="relevance">Trier : pertinence</option><option value="ramAsc">RAM : faible → élevée</option><option value="ramDesc">RAM : élevée → faible</option><option value="diskAsc">Disque : faible → élevé</option><option value="name">Nom A → Z</option><option value="family">Famille A → Z</option></select>
+<button class="rounded-xl px-3 py-2 text-xs font-bold border border-white/10 bg-white/5 hover:bg-white/10 text-gray-200" onclick="clearModelFilters()"><i class="fa-solid fa-rotate-left mr-1"></i> Réinitialiser</button>
+</div>
+<div class="flex gap-2 mb-4 flex-wrap">
+<button class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white" id="explorer-tab-recommended" onclick="selectExplorerTab('recommended')"><i class="fa-solid fa-microchip mr-1"></i> Adaptés à ton appareil</button>
+<button class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-slate-800 text-gray-400 hover:text-white border border-white/10" id="explorer-tab-all" onclick="selectExplorerTab('all')"><i class="fa-solid fa-book-open mr-1"></i> Toute la bibliothèque</button>
+<button class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-slate-800 text-gray-400 hover:text-white border border-white/10" id="explorer-tab-popular" onclick="selectExplorerTab('popular')"><i class="fa-solid fa-fire mr-1"></i> Incontournables</button>
+<button class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-slate-800 text-gray-400 hover:text-white border border-white/10" id="explorer-tab-recent" onclick="selectExplorerTab('recent')"><i class="fa-solid fa-sparkles mr-1"></i> Nouveautés</button>
+<button class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-slate-800 text-gray-400 hover:text-white border border-white/10" id="explorer-tab-favorites" onclick="selectExplorerTab('favorites')"><i class="fa-solid fa-star mr-1"></i> Favoris</button>
+</div>
+<div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+<div class="flex items-center gap-2"><span class="inline-flex h-2 w-2 rounded-full bg-emerald-400" id="model-library-live" title="Catalogue prêt"></span><p aria-live="polite" class="text-xs text-gray-400" id="model-library-count"></p></div>
+<p class="text-[10px] text-amber-200/80"><i class="fa-solid fa-circle-info mr-1"></i> Les commandes sont fiables pour les fiches officielles ; une variante GGUF exacte s’installe plutôt dans LM Studio.</p>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3" id="model-explorer-grid"></div>
+<div class="mt-5 flex flex-wrap justify-between items-center gap-3 border-t border-white/10 pt-4" id="model-library-pagination">
+<p class="text-xs text-gray-500" id="model-library-page-info"></p>
+<div class="flex items-center gap-2">
+<button class="px-3 py-2 rounded-lg text-xs font-bold border border-white/10 bg-slate-800 text-gray-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed" id="model-page-prev" onclick="changeModelPage(-1)"><i class="fa-solid fa-chevron-left mr-1"></i> Précédent</button>
+<button class="px-3 py-2 rounded-lg text-xs font-bold border border-white/10 bg-fuchsia-500/20 text-fuchsia-100 hover:bg-fuchsia-500/35 disabled:opacity-40 disabled:cursor-not-allowed" id="model-page-next" onclick="changeModelPage(1)">Suivant <i class="fa-solid fa-chevron-right ml-1"></i></button>
+</div>
+</div>
+<p class="text-[10px] text-gray-500 mt-4">La bibliothèque distingue les modèles officiels et les formats locaux. Les tailles et la RAM sont des estimations : vérifie toujours la fiche du dépôt avant de télécharger.</p>
+</div>
+</div>
+<!-- Mes modèles locaux : détection depuis Ollama / LM Studio -->
+<div class="hidden fixed inset-0 z-[115] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4" id="freev-installed-models-modal" onclick="if(event.target===this) closeInstalledModels()" role="dialog" aria-modal="true" aria-labelledby="freev-installed-title">
+  <div class="w-full max-w-3xl max-h-[88vh] overflow-hidden rounded-2xl border border-emerald-400/25 bg-slate-950 shadow-2xl">
+    <div class="flex items-start justify-between gap-4 border-b border-white/10 p-5">
+      <div>
+        <p class="text-[10px] uppercase tracking-[0.2em] text-emerald-300 font-bold">Connexion locale</p>
+        <h3 id="freev-installed-title" class="mt-1 text-xl font-heading font-bold text-white"><i class="fa-solid fa-hard-drive mr-2 text-emerald-300"></i>Mes modèles installés</h3>
+        <p class="mt-1 text-xs text-gray-400">Freev lit uniquement les modèles présents sur ton ordinateur via Ollama ou le serveur local LM Studio.</p>
+      </div>
+      <button type="button" class="rounded-full p-2 text-gray-400 hover:bg-white/10 hover:text-white" aria-label="Fermer" onclick="closeInstalledModels()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="p-5 space-y-4 overflow-y-auto max-h-[calc(88vh-100px)]">
+      <div class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3 items-center">
+        <div class="grid grid-cols-2 gap-2" role="group" aria-label="Choisir le moteur local">
+          <button type="button" id="freev-local-runtime-ollama" onclick="setInstalledRuntime('ollama')" class="rounded-xl px-3 py-2 text-xs font-bold bg-emerald-500 text-slate-950"><i class="fa-solid fa-terminal mr-1"></i> Ollama</button>
+          <button type="button" id="freev-local-runtime-lmstudio" onclick="setInstalledRuntime('lmstudio')" class="rounded-xl border border-white/10 bg-slate-800 px-3 py-2 text-xs font-bold text-gray-300 hover:text-white"><i class="fa-solid fa-window-maximize mr-1"></i> LM Studio</button>
+        </div>
+        <button type="button" id="freev-local-refresh" onclick="refreshInstalledModels()" class="rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-xs font-bold text-emerald-100 hover:bg-emerald-500/20"><i class="fa-solid fa-rotate-right mr-1"></i> Actualiser</button>
+      </div>
+      <div id="freev-local-status" class="rounded-xl border border-white/10 bg-slate-900/70 p-3 text-xs text-gray-300" role="status" aria-live="polite">Choisis un moteur puis clique sur Actualiser.</div>
+      <div class="relative">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
+        <input id="freev-local-search" type="search" autocomplete="off" oninput="filterInstalledModels()" placeholder="Filtrer les modèles détectés…" class="w-full rounded-xl border border-white/10 bg-slate-900 pl-9 pr-3 py-2.5 text-sm text-white outline-none focus:border-emerald-400/70">
+      </div>
+      <div id="freev-installed-selected" class="hidden rounded-xl border border-fuchsia-400/25 bg-fuchsia-500/5 p-3 text-xs text-fuchsia-50"></div>
+      <div id="freev-installed-list" class="space-y-2"></div>
+      <div class="rounded-xl border border-amber-400/20 bg-amber-500/5 p-3 text-[11px] text-amber-100"><i class="fa-solid fa-shield-halved mr-1 text-amber-300"></i> Cette détection reste sur <code>localhost</code>. Aucun nom de modèle n’est envoyé vers Internet. Si la liste reste vide, démarre Ollama ou active le serveur local dans l’onglet <strong>Developer</strong> de LM Studio.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Guide d’installation d’un modèle -->
+<div class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" id="model-install-modal" onclick="if(event.target===this) closeInstallGuide()">
+<div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-900 border border-fuchsia-400/30 rounded-2xl p-5 sm:p-6 shadow-2xl">
+<div class="flex items-start justify-between gap-4 mb-4"><div><p class="text-[10px] uppercase tracking-[0.2em] text-fuchsia-300 font-bold">Installation guidée</p><h3 class="text-lg sm:text-xl font-heading font-bold text-white mt-1" id="install-guide-title">Modèle</h3><p class="text-xs text-gray-400 mt-1" id="install-guide-meta"></p></div><button aria-label="Fermer" class="p-2 text-gray-400 hover:text-white rounded-full hover:bg-white/10" onclick="closeInstallGuide()"><i class="fa-solid fa-xmark"></i></button></div>
+<div class="grid grid-cols-2 gap-2 mb-4"><button class="rounded-xl px-3 py-2 text-xs font-bold bg-fuchsia-500 text-white" id="install-guide-ollama" onclick="setInstallRuntime('ollama')"><i class="fa-solid fa-terminal mr-1"></i> Ollama</button><button class="rounded-xl px-3 py-2 text-xs font-bold border border-white/10 bg-slate-800 text-gray-300 hover:text-white" id="install-guide-lmstudio" onclick="setInstallRuntime('lmstudio')"><i class="fa-solid fa-window-maximize mr-1"></i> LM Studio</button></div>
+<div id="install-guide-content"></div>
+</div>
+</div>
+
+<!-- La section étudiante a été entièrement supprimée -->
+<!-- Footer -->
+<footer class="bg-black border-t border-white/10 pt-16 pb-24 md:pb-8" id="contact">
+<div class="container mx-auto px-6">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+<div class="col-span-1 md:col-span-1">
+<h2 class="text-2xl font-heading font-bold mb-4">FREEV<span class="text-brand-primary">.</span></h2>
+<p class="text-gray-500 text-sm">
+                        L'univers digital imaginé et conçu par Trystan2340. 
+                        Innovation, Jeux et Éducation.
+                    </p>
+</div>
+<div>
+<h4 class="font-bold mb-4 text-white">Contact</h4>
+<p class="text-gray-400 text-sm mb-2">Une question ? Un projet ?</p>
+<a class="email-link email-text text-brand-primary hover:text-white transition-colors text-sm font-bold" href="#">
+                        trystan.bonnin27@icloud.com
+                    </a>
+</div>
+<!-- La section "Suivez-nous" a été supprimée -->
+</div>
+<div class="border-t border-white/5 pt-8 text-center text-gray-600 text-sm">
+<!-- Correction de l'année -->
+                © 2026 Freev by Trystan2340. Tous droits réservés.
+            </div>
+</div>
+</footer>
+<!-- Scripts -->
+<!-- Scripts applicatifs (fichiers externes) -->
+<script src="js/email-fix.js"></script>
+<script src="js/app.js"></script>
+<script src="js/login-modal.js"></script>
+<script id="freev-auth-module" type="module" src="js/firebase-auth.js"></script>
+<script src="js/auth-fallback.js"></script>
+<!-- Bibliothèque de modèles IA : moteur unique (recherche, filtres, runtime, installation, détection locale) -->
+<script id="freev-model-library-engine" src="js/model-library.js"></script>
+
+</body>
+</html>
